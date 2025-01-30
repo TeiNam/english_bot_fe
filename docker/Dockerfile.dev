@@ -1,0 +1,20 @@
+FROM node:20-alpine
+
+# Set timezone
+ENV TZ=Asia/Seoul
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+WORKDIR /app
+
+# Install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Copy source code
+COPY . .
+
+# Expose Vite development port
+EXPOSE 5173
+
+# Start development server with host option
+CMD ["npm", "run", "dev", "--", "--host"]
