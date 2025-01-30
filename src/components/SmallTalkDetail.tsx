@@ -1,4 +1,3 @@
-import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getSmallTalk } from '../api/smallTalk';
 import { getAnswers } from '../api/answer';

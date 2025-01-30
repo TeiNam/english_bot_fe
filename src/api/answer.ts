@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { Answer } from '../types/smallTalk';
 import { useAuthStore } from '../store/authStore';
+import { config } from '../config';
 
-const API_URL = 'http://localhost:8000';
+const API_URL = config.apiUrl;
 
 export const getAnswers = async (talkId: number): Promise<Answer[]> => {
     const token = useAuthStore.getState().token;

@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { SmallTalkList } from '../components/SmallTalkList';
-import { SmallTalkDetail } from '../components/SmallTalkDetail';
 import { ManageSmallTalkForm } from '../components/ManageSmallTalkForm';
 import { ManageAnswerForm } from '../components/ManageAnswerForm';
 import { getSmallTalk, deleteSmallTalk } from '../api/smallTalk';
@@ -42,6 +41,7 @@ export const Manage = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['answers', selectedTalkId] });
             queryClient.invalidateQueries({ queryKey: ['answerCounts'] });
+            setSelectedTalkId(null); // 선택된 항목 초기화
         }
     });
 
@@ -65,6 +65,18 @@ export const Manage = () => {
         if (window.confirm('정말로 이 답변을 삭제하시겠습니까?')) {
             await deleteAnswerMutation.mutateAsync(answerId);
         }
+    };
+
+    const handleSmallTalkFormClose = () => {
+        setIsSmallTalkFormOpen(false);
+        setEditingSmallTalk(null);
+        setSelectedTalkId(null); // 선택된 항목 초기화
+    };
+
+    const handleAnswerFormClose = () => {
+        setIsAnswerFormOpen(false);
+        setEditingAnswer(null);
+        setSelectedTalkId(null); // 선택된 항목 초기화
     };
 
     return (
@@ -191,10 +203,7 @@ export const Manage = () => {
                         </h2>
                         <ManageSmallTalkForm
                             initialData={editingSmallTalk || undefined}
-                            onClose={() => {
-                                setIsSmallTalkFormOpen(false);
-                                setEditingSmallTalk(null);
-                            }}
+                            onClose={handleSmallTalkFormClose}
                         />
                     </div>
                 </div>
@@ -210,10 +219,7 @@ export const Manage = () => {
                         <ManageAnswerForm
                             talkId={selectedTalkId}
                             initialData={editingAnswer || undefined}
-                            onClose={() => {
-                                setIsAnswerFormOpen(false);
-                                setEditingAnswer(null);
-                            }}
+                            onClose={handleAnswerFormClose}
                         />
                     </div>
                 </div>

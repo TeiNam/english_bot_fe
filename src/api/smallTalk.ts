@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { SmallTalk, SmallTalkResponse } from '../types/smallTalk';
 import { useAuthStore } from '../store/authStore';
+import { config } from '../config';
 
-const API_URL = 'http://localhost:8000';
+const API_URL = config.apiUrl;
 
 export const getSmallTalks = async (page: number = 1, size: number = 10): Promise<SmallTalkResponse> => {
     const token = useAuthStore.getState().token;

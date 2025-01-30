@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { getSmallTalks } from '../api/smallTalk';
 import { getAnswerCount } from '../api/answer';
 import { MessageSquare, Calendar, Tag, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
@@ -9,14 +9,26 @@ interface Props {
     selectedTalkId: number | null;
 }
 
+interface SmallTalk {
+    talk_id: number;
+    eng_sentence: string;
+    create_at: string | null;
+    tag: string | null;
+}
+
+interface SmallTalkResponse {
+    items: SmallTalk[];
+    total_pages: number;
+}
+
 export const SmallTalkList = ({ onSelectTalk, selectedTalkId }: Props) => {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const itemsPerPage = 10;
 
-    const { data, isLoading, error } = useQuery({
+    const { data, isLoading, error } = useQuery<SmallTalkResponse>({
         queryKey: ['smallTalks', currentPage],
         queryFn: () => getSmallTalks(currentPage, itemsPerPage),
-        keepPreviousData: true
+        placeholderData: keepPreviousData
     });
 
     // 각 스몰톡의 답변 개수를 가져오기

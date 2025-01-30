@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { SmallTalkList } from '../components/SmallTalkList';
 import { SmallTalkDetail } from '../components/SmallTalkDetail';
 
