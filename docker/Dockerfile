@@ -1,9 +1,13 @@
 # Build and serve stage
-FROM node:20-alpine
+FROM node:20-slim
 
-# Set timezone
+# Set timezone and install required packages
 ENV TZ=Asia/Seoul
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+RUN apt-get update && apt-get install -y \
+    tzdata \
+    xsel \
+    && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
