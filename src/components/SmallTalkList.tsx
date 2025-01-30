@@ -28,10 +28,11 @@ export const SmallTalkList = ({ onSelectTalk, selectedTalkId }: Props) => {
     const { data, isLoading, error } = useQuery<SmallTalkResponse>({
         queryKey: ['smallTalks', currentPage],
         queryFn: () => getSmallTalks(currentPage, itemsPerPage),
-        placeholderData: keepPreviousData
+        placeholderData: keepPreviousData,
+        staleTime: 1000 * 60 * 5, // 5분
     });
 
-    // 각 스몰톡의 답변 개수를 가져오기
+    // 답변 개수를 가져오는 쿼리 최적화
     const answerCounts = useQuery({
         queryKey: ['answerCounts', data?.items?.map(talk => talk.talk_id)],
         queryFn: async () => {
@@ -44,13 +45,19 @@ export const SmallTalkList = ({ onSelectTalk, selectedTalkId }: Props) => {
             );
             return Object.fromEntries(counts.map(({ talkId, count }) => [talkId, count]));
         },
-        enabled: !!data?.items
+        enabled: !!data?.items,
+        staleTime: 1000 * 60 * 5, // 5분
     });
 
+    // 로딩 상태 최적화
     if (isLoading) {
         return (
-            <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"></div>
+            <div className="space-y-4">
+                {[...Array(5)].map((_, index) => (
+                    <div key={index} className="animate-pulse">
+                        <div className="h-24 bg-gray-200 rounded-lg"></div>
+                    </div>
+                ))}
             </div>
         );
     }
