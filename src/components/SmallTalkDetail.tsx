@@ -59,9 +59,11 @@ export const SmallTalkDetail = ({ talkId, onClose }: Props) => {
                 )}
 
                 {talk.parenthesis && (
-                    <div className="flex items-start space-x-2 text-gray-600 bg-gray-50 p-4 rounded-lg">
-                        <Info className="h-5 w-5 text-gray-400 mt-0.5" />
-                        <p>{talk.parenthesis}</p>
+                    <div className="flex items-start space-x-3 text-gray-600 bg-gray-50 p-4 rounded-lg">
+                        <div className="flex-shrink-0 bg-white rounded-full p-1 shadow-sm">
+                            <Info className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <pre className="whitespace-pre-wrap font-sans text-sm break-words flex-grow">{talk.parenthesis}</pre>
                     </div>
                 )}
 

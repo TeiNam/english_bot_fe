@@ -6,7 +6,7 @@ import { ManageAnswerForm } from '../components/ManageAnswerForm';
 import { BotControlPanel } from '../components/BotControlPanel';
 import { getSmallTalk, deleteSmallTalk } from '../api/smallTalk';
 import { getAnswers, deleteAnswer } from '../api/answer';
-import { Plus, Edit2, Trash2, MessageCircle } from 'lucide-react';
+import { Plus, Edit2, Trash2, MessageCircle, Info } from 'lucide-react';
 import { SmallTalk, Answer } from '../types/smallTalk';
 
 export const Manage = () => {
@@ -85,7 +85,7 @@ export const Manage = () => {
                             새 문장
                         </button>
                     </div>
-                    <div className="h-[20px]" /> {/* 제목과 리스트 사이의 간격 */}
+                    <div className="h-[20px]" />
                     <SmallTalkList
                         onSelectTalk={setSelectedTalkId}
                         selectedTalkId={selectedTalkId}
@@ -120,7 +120,12 @@ export const Manage = () => {
                                     <p className="text-gray-600 mb-4">{selectedTalk.kor_sentence}</p>
                                 )}
                                 {selectedTalk.parenthesis && (
-                                    <p className="text-sm text-gray-500">{selectedTalk.parenthesis}</p>
+                                    <div className="flex items-start space-x-3 text-gray-600 bg-gray-50 p-4 rounded-lg">
+                                        <div className="flex-shrink-0 bg-white rounded-full p-1 shadow-sm">
+                                            <Info className="h-5 w-5 text-gray-400" />
+                                        </div>
+                                        <pre className="whitespace-pre-wrap font-sans text-sm break-words flex-grow">{selectedTalk.parenthesis}</pre>
+                                    </div>
                                 )}
                             </div>
 

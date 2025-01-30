@@ -2,6 +2,7 @@ import React from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createSmallTalk, updateSmallTalk } from '../api/smallTalk';
 import { SmallTalk } from '../types/smallTalk';
+import { Info } from 'lucide-react';
 
 interface Props {
     initialData?: SmallTalk;
@@ -22,8 +23,22 @@ export const ManageSmallTalkForm = ({ initialData, onClose }: Props) => {
             initialData
                 ? updateSmallTalk(initialData.talk_id, data)
                 : createSmallTalk(data),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['smallTalks'] });
+        onSuccess: async (data) => {
+            // 전체 목록 갱신
+            await queryClient.invalidateQueries({ queryKey: ['smallTalks'] });
+
+            // 개별 상세 데이터 갱신
+            if (initialData) {
+                await queryClient.invalidateQueries({
+                    queryKey: ['smallTalk', initialData.talk_id]
+                });
+            }
+
+            // 캐시 즉시 업데이트
+            if (initialData) {
+                queryClient.setQueryData(['smallTalk', initialData.talk_id], data);
+            }
+
             onClose();
         }
     });
@@ -63,15 +78,19 @@ export const ManageSmallTalkForm = ({ initialData, onClose }: Props) => {
             </div>
 
             <div>
-                <label htmlFor="parenthesis" className="block text-sm font-medium text-gray-700">
-                    부가 설명
+                <label htmlFor="parenthesis" className="block text-sm font-medium text-gray-700 mb-1">
+                    <div className="flex items-center space-x-2">
+                        <Info className="h-4 w-4 text-gray-400" />
+                        <span>부가 설명</span>
+                    </div>
                 </label>
                 <textarea
                     id="parenthesis"
                     value={formData.parenthesis}
                     onChange={(e) => setFormData(prev => ({ ...prev, parenthesis: e.target.value }))}
-                    rows={3}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    rows={5}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm font-sans"
+                    style={{ whiteSpace: 'pre-wrap' }}
                 />
             </div>
 
