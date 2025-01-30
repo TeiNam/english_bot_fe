@@ -3,9 +3,9 @@ FROM node:20-slim
 
 # Set timezone and install required packages
 ENV TZ=Asia/Seoul
+
 RUN apt-get update && apt-get install -y \
     tzdata \
-    xsel \
     && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
     && rm -rf /var/lib/apt/lists/*
 
@@ -15,10 +15,13 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
-# Copy source code
+# Copy source code and serve config
 COPY . .
+COPY serve.json /app/dist/
 
 # Build the application
+ARG VITE_API_URL
+ENV VITE_API_URL=${VITE_API_URL}
 RUN npm run build
 
 # Install serve globally
