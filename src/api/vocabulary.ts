@@ -77,7 +77,7 @@ export const createVocabulary = async (data: any): Promise<Vocabulary> => {
             .map((m: any) => ({
                 meaning: m.meaning.trim(),
                 classes: m.classes?.trim() || '기타',
-                example: m.example?.trim() || '-',
+                example: m.example?.trim() || '예문 없음',
                 parenthesis: m.parenthesis?.trim() || null
             }))
     };
@@ -104,7 +104,7 @@ export const updateVocabulary = async (vocabularyId: number, data: any): Promise
             .map((m: any) => ({
                 meaning: m.meaning.trim(),
                 classes: m.classes?.trim() || '기타',
-                example: m.example?.trim() || '-',
+                example: m.example?.trim() || '예문 없음',
                 parenthesis: m.parenthesis?.trim() || null
             }))
     };

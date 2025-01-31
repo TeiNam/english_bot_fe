@@ -24,7 +24,13 @@ export default function ManageVocabularyMeaningForm({ initialData, onSubmit, onC
             return;
         }
 
-        onSubmit(formData);
+        // Process the data to remove empty example
+        const processedData = { ...formData };
+        if (!processedData.example.trim()) {
+            delete processedData.example;
+        }
+
+        onSubmit(processedData);
     };
 
     return (
@@ -63,6 +69,7 @@ export default function ManageVocabularyMeaningForm({ initialData, onSubmit, onC
                     value={formData.example}
                     onChange={(e) => setFormData(prev => ({ ...prev, example: e.target.value }))}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    placeholder="예문을 입력하세요 (선택사항)"
                 />
             </div>
 

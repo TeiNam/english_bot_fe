@@ -66,7 +66,20 @@ export const ManageVocabularyForm = ({ vocabularyId, onClose }: Props) => {
             return;
         }
 
-        mutation.mutate(formData);
+        // 빈 예문은 제외하고 데이터 전송
+        const processedData = {
+            ...formData,
+            meanings: formData.meanings.map(m => {
+                const meaning = { ...m };
+                // 예문이 비어있으면 필드 자체를 제외
+                if (!meaning.example.trim()) {
+                    delete meaning.example;
+                }
+                return meaning;
+            })
+        };
+
+        mutation.mutate(processedData);
     };
 
     const addMeaning = () => {
@@ -223,6 +236,7 @@ export const ManageVocabularyForm = ({ vocabularyId, onClose }: Props) => {
                                 value={meaning.example}
                                 onChange={(e) => updateMeaning(index, 'example', e.target.value)}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                placeholder="예문을 입력하세요 (선택사항)"
                             />
                         </div>
 

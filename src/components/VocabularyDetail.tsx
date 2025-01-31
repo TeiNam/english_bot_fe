@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getVocabulary, updateVocabulary } from '../api/vocabulary';
-import { Book, Info, Plus } from 'lucide-react';
+import { Book, Info, Plus, Edit2, Trash2 } from 'lucide-react';
 import ManageVocabularyMeaningForm from './ManageVocabularyMeaningForm';
 import { useState } from 'react';
 import { VocabularyMeaning } from '../types/vocabulary';
@@ -156,9 +156,23 @@ export const VocabularyDetail = ({ vocabularyId, onClose }: Props) => {
                         {vocabulary.meanings.map((meaning) => (
                             <div
                                 key={meaning.meaning_id}
-                                className="border-l-4 border-indigo-200 pl-4 py-2"
+                                className="border-l-4 border-indigo-200 pl-4 py-2 relative"
                             >
-                                <div className="space-y-2">
+                                <div className="absolute top-2 right-2 flex space-x-2">
+                                    <button
+                                        onClick={() => handleEditMeaning(meaning)}
+                                        className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                                    >
+                                        <Edit2 className="h-4 w-4" />
+                                    </button>
+                                    <button
+                                        onClick={() => handleDeleteMeaning(meaning.meaning_id)}
+                                        className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </button>
+                                </div>
+                                <div className="space-y-2 pr-16">
                                     <div className="flex items-center space-x-2">
                                         {meaning.classes && (
                                             <span className="text-sm font-medium text-gray-500">
