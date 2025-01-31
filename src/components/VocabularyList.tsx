@@ -1,55 +1,26 @@
 import { useState } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { getSmallTalks } from '../api/smallTalk';
-import { getAnswerCount } from '../api/answer';
-import { MessageSquare, Calendar, Tag, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { getVocabularies } from '../api/vocabulary';
+import { Book, Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Edit2, Trash2 } from 'lucide-react';
 
 interface Props {
-    onSelectTalk: (talkId: number) => void;
-    selectedTalkId: number | null;
-    pageSize?: number; // Add optional pageSize prop
+    onSelectVocabulary: (vocabularyId: number) => void;
+    selectedVocabularyId: number | null;
+    onEdit: (vocabularyId: number) => void;
+    onDelete: (vocabularyId: number) => void;
 }
 
-interface SmallTalk {
-    talk_id: number;
-    eng_sentence: string;
-    create_at: string | null;
-    tag: string | null;
-}
-
-interface SmallTalkResponse {
-    items: SmallTalk[];
-    total_pages: number;
-}
-
-export const SmallTalkList = ({ onSelectTalk, selectedTalkId, pageSize = 10 }: Props) => {
+export default function VocabularyList({ onSelectVocabulary, selectedVocabularyId, onEdit, onDelete }: Props) {
     const [currentPage, setCurrentPage] = useState<number>(1);
+    const itemsPerPage = 10;
 
     const { data, isLoading, error } = useQuery({
-        queryKey: ['smallTalks', currentPage, pageSize],
-        queryFn: () => getSmallTalks(currentPage, pageSize),
+        queryKey: ['vocabularies', currentPage],
+        queryFn: () => getVocabularies(currentPage, itemsPerPage),
         placeholderData: keepPreviousData,
         staleTime: 1000 * 60 * 5, // 5분
     });
 
-    // 답변 개수를 가져오는 쿼리 최적화
-    const answerCounts = useQuery({
-        queryKey: ['answerCounts', data?.items?.map(talk => talk.talk_id)],
-        queryFn: async () => {
-            if (!data?.items) return {};
-            const counts = await Promise.all(
-                data.items.map(async talk => ({
-                    talkId: talk.talk_id,
-                    count: await getAnswerCount(talk.talk_id)
-                }))
-            );
-            return Object.fromEntries(counts.map(({ talkId, count }) => [talkId, count]));
-        },
-        enabled: !!data?.items,
-        staleTime: 1000 * 60 * 5, // 5분
-    });
-
-    // 로딩 상태 최적화
     if (isLoading) {
         return (
             <div className="space-y-4">
@@ -65,7 +36,7 @@ export const SmallTalkList = ({ onSelectTalk, selectedTalkId, pageSize = 10 }: P
     if (error) {
         return (
             <div className="text-center text-red-600 p-4">
-                스몰톡을 불러오는데 실패했습니다
+                단어를 불러오는데 실패했습니다
             </div>
         );
     }
@@ -73,7 +44,7 @@ export const SmallTalkList = ({ onSelectTalk, selectedTalkId, pageSize = 10 }: P
     if (!data?.items || data.items.length === 0) {
         return (
             <div className="text-center text-gray-500 p-4">
-                등록된 문장이 없습니다
+                등록된 단어가 없습니다
             </div>
         );
     }
@@ -99,7 +70,6 @@ export const SmallTalkList = ({ onSelectTalk, selectedTalkId, pageSize = 10 }: P
         }
     };
 
-    // 페이지 번호 목록 생성
     const getPageNumbers = () => {
         const maxVisiblePages = 5;
         const pages = [];
@@ -119,34 +89,54 @@ export const SmallTalkList = ({ onSelectTalk, selectedTalkId, pageSize = 10 }: P
     return (
         <div className="space-y-6">
             <div className="space-y-4">
-                {data.items.map((talk) => (
+                {data.items.map((vocabulary) => (
                     <div
-                        key={talk.talk_id}
-                        onClick={() => onSelectTalk(talk.talk_id)}
-                        className={`cursor-pointer p-4 rounded-lg border transition-colors ${
-                            selectedTalkId === talk.talk_id
+                        key={vocabulary.vocabulary_id}
+                        className={`p-4 rounded-lg border transition-colors ${
+                            selectedVocabularyId === vocabulary.vocabulary_id
                                 ? 'bg-indigo-50 border-indigo-200'
                                 : 'bg-white border-gray-200 hover:bg-gray-50'
                         }`}
                     >
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">
-                            {talk.eng_sentence}
-                        </h3>
-                        <div className="flex items-center space-x-4 text-sm text-gray-500">
-              <span className="flex items-center">
-                <MessageSquare className="h-4 w-4 mr-1" />
-                  {answerCounts.data?.[talk.talk_id] ?? 0} 답변
-              </span>
-                            <span className="flex items-center">
-                <Calendar className="h-4 w-4 mr-1" />
-                                {formatDate(talk.create_at)}
-              </span>
-                            {talk.tag && (
-                                <span className="flex items-center">
-                  <Tag className="h-4 w-4 mr-1" />
-                                    {talk.tag}
-                </span>
-                            )}
+                        <div className="flex justify-between items-start">
+                            <div
+                                className="flex-grow cursor-pointer"
+                                onClick={() => onSelectVocabulary(vocabulary.vocabulary_id)}
+                            >
+                                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                                    {vocabulary.word}
+                                </h3>
+                                <div className="flex items-center space-x-4 text-sm text-gray-500">
+                                    <span className="flex items-center">
+                                        <Book className="h-4 w-4 mr-1" />
+                                        {vocabulary.meanings.length} 의미
+                                    </span>
+                                    <span className="flex items-center">
+                                        <Calendar className="h-4 w-4 mr-1" />
+                                        {formatDate(vocabulary.create_at)}
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="flex space-x-2 ml-4">
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onEdit(vocabulary.vocabulary_id);
+                                    }}
+                                    className="p-1 text-gray-400 hover:text-gray-500"
+                                >
+                                    <Edit2 className="h-4 w-4" />
+                                </button>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onDelete(vocabulary.vocabulary_id);
+                                    }}
+                                    className="p-1 text-gray-400 hover:text-red-500"
+                                >
+                                    <Trash2 className="h-4 w-4" />
+                                </button>
+                            </div>
                         </div>
                     </div>
                 ))}
@@ -205,4 +195,4 @@ export const SmallTalkList = ({ onSelectTalk, selectedTalkId, pageSize = 10 }: P
             )}
         </div>
     );
-};
+}

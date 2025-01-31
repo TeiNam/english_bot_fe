@@ -5,13 +5,11 @@ import { config } from '../config';
 
 const API_URL = config.apiUrl;
 
-// API 클라이언트 인스턴스 생성
 const apiClient = axios.create({
     baseURL: API_URL,
-    timeout: 10000, // 10초 타임아웃
+    timeout: 10000,
 });
 
-// 응답 인터셉터 추가
 apiClient.interceptors.response.use(
     response => response,
     error => {
