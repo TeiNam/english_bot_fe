@@ -15,11 +15,18 @@ export default function VocabularyList({ onSelectVocabulary, selectedVocabularyI
     const itemsPerPage = 10;
 
     const { data, isLoading, error } = useQuery({
-        queryKey: ['vocabularies', currentPage],
+        queryKey: ['vocabularies', currentPage, itemsPerPage],
         queryFn: () => getVocabularies(currentPage, itemsPerPage),
         placeholderData: keepPreviousData,
-        staleTime: 1000 * 60 * 5, // 5분
+        staleTime: 1000 * 60 * 5,
+        retry: 3,
+        onError: (error) => {
+            console.error('Query error:', error);
+        }
     });
+
+    // Add debug logging
+    console.log('Query result:', { data, isLoading, error });
 
     if (isLoading) {
         return (
@@ -34,9 +41,10 @@ export default function VocabularyList({ onSelectVocabulary, selectedVocabularyI
     }
 
     if (error) {
+        console.error('Error details:', error);
         return (
             <div className="text-center text-red-600 p-4">
-                단어를 불러오는데 실패했습니다
+                단어를 불러오는데 실패했습니다: {(error as Error).message}
             </div>
         );
     }

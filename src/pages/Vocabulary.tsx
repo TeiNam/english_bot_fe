@@ -1,16 +1,24 @@
 import { useState } from 'react';
+import { Navigate } from 'react-router-dom';
 import VocabularyList from '../components/VocabularyList';
 import { VocabularyDetail } from '../components/VocabularyDetail';
 import { ManageVocabularyForm } from '../components/ManageVocabularyForm';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteVocabulary } from '../api/vocabulary';
 import { Plus } from 'lucide-react';
+import { useAuthStore } from '../store/authStore';
 
 export const Vocabulary = () => {
     const [selectedVocabularyId, setSelectedVocabularyId] = useState<number | null>(null);
     const [isEditMode, setIsEditMode] = useState(false);
     const [isAddMode, setIsAddMode] = useState(false);
     const queryClient = useQueryClient();
+    const token = useAuthStore((state) => state.token);
+
+    // Redirect if not authenticated
+    if (!token) {
+        return <Navigate to="/login" replace />;
+    }
 
     const deleteMutation = useMutation({
         mutationFn: deleteVocabulary,
