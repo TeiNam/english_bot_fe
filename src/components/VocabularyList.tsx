@@ -1,32 +1,34 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { getVocabularies } from '../api/vocabulary';
+import { getVocabularies, searchVocabularies } from '../api/vocabulary';
 import { Book, Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Edit2, Trash2 } from 'lucide-react';
+import debounce from 'lodash/debounce';
 
 interface Props {
     onSelectVocabulary: (vocabularyId: number) => void;
     selectedVocabularyId: number | null;
     onEdit: (vocabularyId: number) => void;
     onDelete: (vocabularyId: number) => void;
+    searchQuery?: string;
 }
 
-export default function VocabularyList({ onSelectVocabulary, selectedVocabularyId, onEdit, onDelete }: Props) {
+export default function VocabularyList({ onSelectVocabulary, selectedVocabularyId, onEdit, onDelete, searchQuery = '' }: Props) {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const itemsPerPage = 10;
 
+    // 검색어가 변경될 때 페이지를 1로 리셋
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery]);
+
     const { data, isLoading, error } = useQuery({
-        queryKey: ['vocabularies', currentPage, itemsPerPage],
-        queryFn: () => getVocabularies(currentPage, itemsPerPage),
+        queryKey: ['vocabularies', currentPage, itemsPerPage, searchQuery],
+        queryFn: () => searchQuery
+            ? searchVocabularies(searchQuery, currentPage, itemsPerPage)
+            : getVocabularies(currentPage, itemsPerPage),
         placeholderData: keepPreviousData,
         staleTime: 1000 * 60 * 5,
-        retry: 3,
-        onError: (error) => {
-            console.error('Query error:', error);
-        }
     });
-
-    // Add debug logging
-    console.log('Query result:', { data, isLoading, error });
 
     if (isLoading) {
         return (
@@ -41,10 +43,9 @@ export default function VocabularyList({ onSelectVocabulary, selectedVocabularyI
     }
 
     if (error) {
-        console.error('Error details:', error);
         return (
             <div className="text-center text-red-600 p-4">
-                단어를 불러오는데 실패했습니다: {(error as Error).message}
+                단어를 불러오는데 실패했습니다
             </div>
         );
     }
@@ -52,7 +53,7 @@ export default function VocabularyList({ onSelectVocabulary, selectedVocabularyI
     if (!data?.items || data.items.length === 0) {
         return (
             <div className="text-center text-gray-500 p-4">
-                등록된 단어가 없습니다
+                {searchQuery ? '검색 결과가 없습니다' : '등록된 단어가 없습니다'}
             </div>
         );
     }

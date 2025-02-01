@@ -1,10 +1,12 @@
-// vocabulary.ts
 import axios from 'axios';
 import { Vocabulary, VocabularyResponse } from '../types/vocabulary';
 import { useAuthStore } from '../store/authStore';
+import { config } from '../config';
+
+const API_URL = config.apiUrl;
 
 const apiClient = axios.create({
-    baseURL: '/api',  // /api prefix 추가
+    baseURL: API_URL,
     timeout: 10000,
 });
 
@@ -18,10 +20,8 @@ apiClient.interceptors.response.use(
 
 export const getVocabularies = async (page: number = 1, size: number = 10): Promise<VocabularyResponse> => {
     const token = useAuthStore.getState().token;
-    console.log('Fetching vocabularies:', { page, size });
-
     try {
-        const response = await apiClient.get<VocabularyResponse>('/vocabulary/', {
+        const response = await apiClient.get<VocabularyResponse>('/api/v1/vocabulary/', {
             params: { page, size },
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -29,8 +29,6 @@ export const getVocabularies = async (page: number = 1, size: number = 10): Prom
                 'Accept': 'application/json'
             }
         });
-
-        console.log('API Response:', response.data);
         return response.data;
     } catch (error) {
         console.error('Error fetching vocabularies:', error);
@@ -40,7 +38,7 @@ export const getVocabularies = async (page: number = 1, size: number = 10): Prom
 
 export const getVocabulary = async (vocabularyId: number): Promise<Vocabulary> => {
     const token = useAuthStore.getState().token;
-    const response = await apiClient.get<Vocabulary>(`/vocabulary/${vocabularyId}`, {
+    const response = await apiClient.get<Vocabulary>(`/api/v1/vocabulary/${vocabularyId}`, {
         headers: {
             Authorization: `Bearer ${token}`,
             'Accept': 'application/json'
@@ -49,40 +47,9 @@ export const getVocabulary = async (vocabularyId: number): Promise<Vocabulary> =
     return response.data;
 };
 
-interface VocabularyMeaningPayload {
-    meaning: string;
-    classes: string;
-    example: string;
-    parenthesis?: string | null;
-}
-
-interface VocabularyPayload {
-    word: string;
-    past_tense: string | null;
-    past_participle: string | null;
-    rule: string;
-    meanings: VocabularyMeaningPayload[];
-}
-
 export const createVocabulary = async (data: any): Promise<Vocabulary> => {
     const token = useAuthStore.getState().token;
-
-    const payload: VocabularyPayload = {
-        word: data.word.trim(),
-        past_tense: data.past_tense?.trim() || null,
-        past_participle: data.past_participle?.trim() || null,
-        rule: data.rule,
-        meanings: data.meanings
-            .filter((m: any) => m.meaning.trim())
-            .map((m: any) => ({
-                meaning: m.meaning.trim(),
-                classes: m.classes?.trim() || '기타',
-                example: m.example?.trim() || '예문 없음',
-                parenthesis: m.parenthesis?.trim() || null
-            }))
-    };
-
-    const response = await apiClient.post<Vocabulary>('/vocabulary/', payload, {
+    const response = await apiClient.post<Vocabulary>('/api/v1/vocabulary/', data, {
         headers: {
             Authorization: `Bearer ${token}`,
             'Accept': 'application/json'
@@ -93,23 +60,7 @@ export const createVocabulary = async (data: any): Promise<Vocabulary> => {
 
 export const updateVocabulary = async (vocabularyId: number, data: any): Promise<Vocabulary> => {
     const token = useAuthStore.getState().token;
-
-    const payload: VocabularyPayload = {
-        word: data.word.trim(),
-        past_tense: data.past_tense?.trim() || null,
-        past_participle: data.past_participle?.trim() || null,
-        rule: data.rule,
-        meanings: data.meanings
-            .filter((m: any) => m.meaning.trim())
-            .map((m: any) => ({
-                meaning: m.meaning.trim(),
-                classes: m.classes?.trim() || '기타',
-                example: m.example?.trim() || '예문 없음',
-                parenthesis: m.parenthesis?.trim() || null
-            }))
-    };
-
-    const response = await apiClient.put<Vocabulary>(`/vocabulary/${vocabularyId}`, payload, {
+    const response = await apiClient.put<Vocabulary>(`/api/v1/vocabulary/${vocabularyId}`, data, {
         headers: {
             Authorization: `Bearer ${token}`,
             'Accept': 'application/json'
@@ -120,10 +71,32 @@ export const updateVocabulary = async (vocabularyId: number, data: any): Promise
 
 export const deleteVocabulary = async (vocabularyId: number): Promise<void> => {
     const token = useAuthStore.getState().token;
-    await apiClient.delete(`/vocabulary/${vocabularyId}`, {
+    await apiClient.delete(`/api/v1/vocabulary/${vocabularyId}`, {
         headers: {
             Authorization: `Bearer ${token}`,
             'Accept': 'application/json'
         }
     });
+};
+
+// 단어 검색 API
+export const searchVocabularies = async (query: string, page: number = 1, size: number = 10): Promise<VocabularyResponse> => {
+    if (!query.trim()) {
+        return getVocabularies(page, size);
+    }
+
+    const token = useAuthStore.getState().token;
+    try {
+        const response = await apiClient.get<VocabularyResponse>('/api/v1/vocabulary/text-search', {
+            params: { q: query, page, size },
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Accept': 'application/json'
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error searching vocabularies:', error);
+        throw error;
+    }
 };

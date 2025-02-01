@@ -102,104 +102,105 @@ export const VocabularyDetail = ({ vocabularyId, onClose }: Props) => {
     }
 
     return (
-        <div className="bg-white rounded-lg shadow-lg p-6">
-            <div className="flex justify-between items-start mb-6">
-                <div>
-                    <h2 className="text-2xl font-bold text-gray-900">{vocabulary.word}</h2>
-                    {(vocabulary.past_tense || vocabulary.past_participle) && (
-                        <div className="mt-2 text-sm text-gray-600">
-                            {vocabulary.past_tense && <span>과거형: {vocabulary.past_tense}</span>}
-                            {vocabulary.past_tense && vocabulary.past_participle && <span className="mx-2">|</span>}
-                            {vocabulary.past_participle && <span>과거분사: {vocabulary.past_participle}</span>}
-                        </div>
-                    )}
-                    {vocabulary.rule && (
-                        <div className="mt-1">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                vocabulary.rule === '규칙' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                            }`}>
-                                {vocabulary.rule}
-                            </span>
-                        </div>
-                    )}
+        <div className="bg-white rounded-lg shadow-lg">
+            <div className="p-6 border-b border-gray-200">
+                <div className="flex justify-between items-start">
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-900">{vocabulary.word}</h2>
+                        {(vocabulary.past_tense || vocabulary.past_participle) && (
+                            <div className="mt-2 text-sm text-gray-600">
+                                {vocabulary.past_tense && <span>과거형: {vocabulary.past_tense}</span>}
+                                {vocabulary.past_tense && vocabulary.past_participle && <span className="mx-2">|</span>}
+                                {vocabulary.past_participle && <span>과거분사: {vocabulary.past_participle}</span>}
+                            </div>
+                        )}
+                        {vocabulary.rule && (
+                            <div className="mt-1">
+                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                    vocabulary.rule === '규칙' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                                }`}>
+                                    {vocabulary.rule}
+                                </span>
+                            </div>
+                        )}
+                    </div>
+                    <button
+                        onClick={onClose}
+                        className="text-gray-400 hover:text-gray-500"
+                    >
+                        <span className="sr-only">닫기</span>
+                        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
-                <button
-                    onClick={onClose}
-                    className="text-gray-400 hover:text-gray-500"
-                >
-                    <span className="sr-only">닫기</span>
-                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
             </div>
 
-            <div className="space-y-6">
-                <div className="mt-8">
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-lg font-medium text-gray-900 flex items-center">
-                            <Book className="h-5 w-5 mr-2" />
-                            의미
-                        </h3>
-                        <button
-                            onClick={() => {
-                                setEditingMeaning(null);
-                                setIsAddingMeaning(true);
-                            }}
-                            className="flex items-center px-3 py-1 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            <div className="p-6">
+                <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-medium text-gray-900 flex items-center">
+                        <Book className="h-5 w-5 mr-2" />
+                        의미
+                    </h3>
+                    <button
+                        onClick={() => {
+                            setEditingMeaning(null);
+                            setIsAddingMeaning(true);
+                        }}
+                        className="flex items-center px-3 py-1 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    >
+                        <Plus className="h-4 w-4 mr-1" />
+                        의미 추가
+                    </button>
+                </div>
+
+                <div className="space-y-4">
+                    {vocabulary.meanings.map((meaning) => (
+                        <div
+                            key={meaning.meaning_id}
+                            className="border-l-4 border-indigo-200 pl-4 py-2 relative"
                         >
-                            <Plus className="h-4 w-4 mr-1" />
-                            의미 추가
-                        </button>
-                    </div>
-                    <div className="space-y-4">
-                        {vocabulary.meanings.map((meaning) => (
-                            <div
-                                key={meaning.meaning_id}
-                                className="border-l-4 border-indigo-200 pl-4 py-2 relative"
-                            >
-                                <div className="absolute top-2 right-2 flex space-x-2">
-                                    <button
-                                        onClick={() => handleEditMeaning(meaning)}
-                                        className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
-                                    >
-                                        <Edit2 className="h-4 w-4" />
-                                    </button>
-                                    <button
-                                        onClick={() => handleDeleteMeaning(meaning.meaning_id)}
-                                        className="p-1 text-gray-400 hover:text-red-500 transition-colors"
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </button>
-                                </div>
-                                <div className="space-y-2 pr-16">
-                                    <div className="flex items-center space-x-2">
-                                        {meaning.classes && (
-                                            <span className="text-sm font-medium text-gray-500">
-                                                [{meaning.classes}]
-                                            </span>
-                                        )}
-                                        <p className="text-gray-900">{meaning.meaning}</p>
-                                    </div>
-                                    {meaning.example ? (
-                                        <p className="text-sm text-gray-600 italic">
-                                            "{meaning.example}"
-                                        </p>
-                                    ) : (
-                                        <p className="text-sm text-gray-500">
-                                            예문 없음
-                                        </p>
-                                    )}
-                                    {meaning.parenthesis && (
-                                        <div className="flex items-start space-x-2 text-sm text-gray-500 bg-gray-50 p-3 rounded">
-                                            <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                                            <pre className="whitespace-pre-wrap font-sans break-words flex-grow">{meaning.parenthesis}</pre>
-                                        </div>
-                                    )}
-                                </div>
+                            <div className="absolute top-2 right-2 flex space-x-2">
+                                <button
+                                    onClick={() => handleEditMeaning(meaning)}
+                                    className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                                >
+                                    <Edit2 className="h-4 w-4" />
+                                </button>
+                                <button
+                                    onClick={() => handleDeleteMeaning(meaning.meaning_id)}
+                                    className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                                >
+                                    <Trash2 className="h-4 w-4" />
+                                </button>
                             </div>
-                        ))}
-                    </div>
+                            <div className="space-y-2 pr-16">
+                                <div className="flex items-center space-x-2">
+                                    {meaning.classes && (
+                                        <span className="text-sm font-medium text-gray-500">
+                                            [{meaning.classes}]
+                                        </span>
+                                    )}
+                                    <p className="text-gray-900">{meaning.meaning}</p>
+                                </div>
+                                {meaning.example ? (
+                                    <p className="text-sm text-gray-600 italic">
+                                        "{meaning.example}"
+                                    </p>
+                                ) : (
+                                    <p className="text-sm text-gray-500">
+                                        예문 없음
+                                    </p>
+                                )}
+                                {meaning.parenthesis && (
+                                    <div className="flex items-start space-x-2 text-sm text-gray-500 bg-gray-50 p-3 rounded">
+                                        <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                                        <pre className="whitespace-pre-wrap font-sans break-words flex-grow">{meaning.parenthesis}</pre>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </div>
 

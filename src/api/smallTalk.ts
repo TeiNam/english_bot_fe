@@ -20,7 +20,7 @@ apiClient.interceptors.response.use(
 
 export const getSmallTalks = async (page: number = 1, size: number = 10): Promise<SmallTalkResponse> => {
     const token = useAuthStore.getState().token;
-    const response = await apiClient.get<SmallTalkResponse>('/small-talk/', {
+    const response = await apiClient.get<SmallTalkResponse>('/api/v1/small-talk/', {
         params: { page, size },
         headers: { Authorization: `Bearer ${token}` }
     });
@@ -29,7 +29,7 @@ export const getSmallTalks = async (page: number = 1, size: number = 10): Promis
 
 export const getSmallTalk = async (talkId: number): Promise<SmallTalk> => {
     const token = useAuthStore.getState().token;
-    const response = await apiClient.get<SmallTalk>(`/small-talk/${talkId}`, {
+    const response = await apiClient.get<SmallTalk>(`/api/v1/small-talk/${talkId}`, {
         headers: { Authorization: `Bearer ${token}` }
     });
     return response.data;
@@ -37,7 +37,7 @@ export const getSmallTalk = async (talkId: number): Promise<SmallTalk> => {
 
 export const createSmallTalk = async (data: Partial<SmallTalk>): Promise<SmallTalk> => {
     const token = useAuthStore.getState().token;
-    const response = await apiClient.post<SmallTalk>('/small-talk/', data, {
+    const response = await apiClient.post<SmallTalk>('/api/v1/small-talk/', data, {
         headers: { Authorization: `Bearer ${token}` }
     });
     return response.data;
@@ -45,7 +45,7 @@ export const createSmallTalk = async (data: Partial<SmallTalk>): Promise<SmallTa
 
 export const updateSmallTalk = async (talkId: number, data: Partial<SmallTalk>): Promise<SmallTalk> => {
     const token = useAuthStore.getState().token;
-    const response = await apiClient.put<SmallTalk>(`/small-talk/${talkId}`, data, {
+    const response = await apiClient.put<SmallTalk>(`/api/v1/small-talk/${talkId}`, data, {
         headers: { Authorization: `Bearer ${token}` }
     });
     return response.data;
@@ -53,7 +53,7 @@ export const updateSmallTalk = async (talkId: number, data: Partial<SmallTalk>):
 
 export const deleteSmallTalk = async (talkId: number): Promise<void> => {
     const token = useAuthStore.getState().token;
-    await apiClient.delete(`/small-talk/${talkId}`, {
+    await apiClient.delete(`/api/v1/small-talk/${talkId}`, {
         headers: { Authorization: `Bearer ${token}` }
     });
 };

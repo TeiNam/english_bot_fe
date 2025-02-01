@@ -5,6 +5,6 @@ import { config } from '../config';
 const API_URL = config.apiUrl;
 
 export const login = async (credentials: LoginCredentials): Promise<AuthResponse> => {
-  const response = await axios.post(`${API_URL}/auth/login`, credentials);
+  const response = await axios.post(`${API_URL}/api/v1/auth/login`, credentials);
   return response.data;
 };
