@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { getGrammar } from '../api/grammar';
-import { ExternalLink, Play } from 'lucide-react';
+import { Play } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -21,10 +21,6 @@ export const GrammarDetail = ({ grammarId, onClose }: Props) => {
         return (match && match[7].length === 11) ? match[7] : null;
     };
 
-    const handleOpenVideo = (url: string) => {
-        window.open(url, '_blank', 'noopener,noreferrer');
-    };
-
     if (isLoading) {
         return (
             <div className="flex justify-center items-center h-64">
@@ -42,7 +38,6 @@ export const GrammarDetail = ({ grammarId, onClose }: Props) => {
     }
 
     const videoId = grammar.url ? getYouTubeVideoId(grammar.url) : null;
-    const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null;
 
     return (
         <div className="bg-white rounded-lg shadow-lg">
@@ -60,28 +55,25 @@ export const GrammarDetail = ({ grammarId, onClose }: Props) => {
                     </button>
                 </div>
 
-                {grammar.url && thumbnailUrl && (
-                    <div className="mb-6 relative group cursor-pointer" onClick={() => handleOpenVideo(grammar.url!)}>
-                        <div className="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden">
-                            <img
-                                src={thumbnailUrl}
-                                alt="Video thumbnail"
-                                className="w-full h-full object-cover"
-                                onError={(e) => {
-                                    // 고화질 썸네일이 없을 경우 기본 썸네일로 대체
-                                    const img = e.target as HTMLImageElement;
-                                    img.src = `https://img.youtube.com/vi/${videoId}/0.jpg`;
-                                }}
-                            />
-                            <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center group-hover:bg-opacity-50 transition-all">
-                                <div className="bg-red-600 rounded-full p-4 group-hover:scale-110 transition-transform">
-                                    <Play className="h-8 w-8 text-white" fill="white" />
+                {grammar.url && (
+                    <div className="mb-6">
+                        <div className="w-full h-0 pb-[56.25%] relative rounded-lg overflow-hidden">
+                            {videoId ? (
+                                <iframe
+                                    src={`https://www.youtube.com/embed/${videoId}`}
+                                    title="YouTube video player"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                    className="absolute top-0 left-0 w-full h-full"
+                                ></iframe>
+                            ) : (
+                                <div className="absolute top-0 left-0 w-full h-full bg-gray-100 flex items-center justify-center">
+                                    <div className="text-center text-gray-500">
+                                        <Play className="h-12 w-12 mx-auto mb-2" />
+                                        <p>동영상을 불러올 수 없습니다</p>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div className="mt-2 flex items-center text-sm text-gray-600">
-                            <ExternalLink className="h-4 w-4 mr-1" />
-                            <span>유튜브에서 보기</span>
+                            )}
                         </div>
                     </div>
                 )}

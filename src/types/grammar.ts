@@ -10,6 +10,9 @@ export interface Grammar {
 export interface GrammarResponse {
     items: Grammar[];
     total: number;
-    skip: number;
-    limit: number;
+    page: number;
+    size: number;
+    total_pages: number;
+    has_next: boolean;
+    has_prev: boolean;
 }

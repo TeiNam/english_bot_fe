@@ -18,10 +18,11 @@ apiClient.interceptors.response.use(
     }
 );
 
-export const getGrammars = async (skip: number = 0, limit: number = 100): Promise<Grammar[]> => {
+export const getGrammars = async (page: number = 1, size: number = 10): Promise<GrammarResponse> => {
     const token = useAuthStore.getState().token;
-    const response = await apiClient.get<Grammar[]>('/api/v1/grammar/', {
-        params: { skip, limit },
+    const skip = (page - 1) * size;
+    const response = await apiClient.get<GrammarResponse>('/api/v1/grammar/', {
+        params: { skip, limit: size },
         headers: { Authorization: `Bearer ${token}` }
     });
     return response.data;
