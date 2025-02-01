@@ -1,68 +1,85 @@
 import { useState, useEffect, useCallback } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { getVocabularies, searchVocabularies } from '../api/vocabulary';
+import { getVocabularies, getVocabularyMeaningCountsByIds, searchVocabularies } from '../api/vocabulary';
 import { Book, Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Edit2, Trash2 } from 'lucide-react';
-import debounce from 'lodash/debounce';
+import { useSearchParams } from 'react-router-dom';
+import { Vocabulary, VocabularyResponse, MeaningCounts } from '../types/vocabulary';
+
+// 타입 정의
+interface Vocabulary {
+    vocabulary_id: number;
+    word: string;
+    create_at: string | null;
+    meanings?: Array<any>; // TODO: meanings의 실제 타입으로 교체 필요
+}
+
+interface VocabulariesResponse {
+    items: Vocabulary[];
+    total_pages: number;
+    current_page: number;
+    total_items: number;
+}
+
+interface MeaningCounts {
+    [key: number]: number;
+}
 
 interface Props {
     onSelectVocabulary: (vocabularyId: number) => void;
     selectedVocabularyId: number | null;
     onEdit: (vocabularyId: number) => void;
-    onDelete: (vocabularyId: number) => void;
+    onDelete: (vocabularyId: number) => Promise<void>;
     searchQuery?: string;
 }
 
-export default function VocabularyList({ onSelectVocabulary, selectedVocabularyId, onEdit, onDelete, searchQuery = '' }: Props) {
-    const [currentPage, setCurrentPage] = useState<number>(1);
+export default function VocabularyList({
+                                           onSelectVocabulary,
+                                           selectedVocabularyId,
+                                           onEdit,
+                                           onDelete,
+                                           searchQuery = ''
+                                       }: Props) {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const currentPage = Number(searchParams.get('page')) || 1;
     const itemsPerPage = 10;
 
     // 검색어가 변경될 때 페이지를 1로 리셋
     useEffect(() => {
-        setCurrentPage(1);
-    }, [searchQuery]);
+        setSearchParams({ page: '1' });
+    }, [searchQuery, setSearchParams]);
 
-    const { data, isLoading, error } = useQuery({
+    const {
+        data,
+        isLoading,
+        error
+    } = useQuery<VocabulariesResponse, Error>({
         queryKey: ['vocabularies', currentPage, itemsPerPage, searchQuery],
         queryFn: () => searchQuery
             ? searchVocabularies(searchQuery, currentPage, itemsPerPage)
             : getVocabularies(currentPage, itemsPerPage),
         placeholderData: keepPreviousData,
-        staleTime: 1000 * 60 * 5,
+        staleTime: 1000 * 60 * 5, // 5분
     });
 
-    if (isLoading) {
-        return (
-            <div className="space-y-4">
-                {[...Array(5)].map((_, index) => (
-                    <div key={index} className="animate-pulse">
-                        <div className="h-24 bg-gray-200 rounded-lg"></div>
-                    </div>
-                ))}
-            </div>
-        );
-    }
+    const {
+        data: meaningCounts,
+        isLoading: isMeaningCountsLoading
+    } = useQuery<MeaningCounts>({
+        queryKey: ['meaning-counts', data?.items?.map(v => v.vocabulary_id)],
+        queryFn: async () => {
+            if (!data?.items?.length) return {};
+            return getVocabularyMeaningCountsByIds(
+                data.items.map(v => v.vocabulary_id)
+            );
+        },
+        enabled: !!data?.items?.length,
+    });
 
-    if (error) {
-        return (
-            <div className="text-center text-red-600 p-4">
-                단어를 불러오는데 실패했습니다
-            </div>
-        );
-    }
+    const handlePageChange = useCallback((page: number) => {
+        setSearchParams({ page: page.toString() });
+    }, [setSearchParams]);
 
-    if (!data?.items || data.items.length === 0) {
-        return (
-            <div className="text-center text-gray-500 p-4">
-                {searchQuery ? '검색 결과가 없습니다' : '등록된 단어가 없습니다'}
-            </div>
-        );
-    }
-
-    const handlePageChange = (page: number) => {
-        setCurrentPage(page);
-    };
-
-    const formatDate = (dateString: string | null) => {
+    const formatDate = useCallback((dateString: string | null) => {
         if (!dateString) return '날짜 없음';
 
         try {
@@ -77,9 +94,11 @@ export default function VocabularyList({ onSelectVocabulary, selectedVocabularyI
         } catch (e) {
             return '날짜 오류';
         }
-    };
+    }, []);
 
-    const getPageNumbers = () => {
+    const getPageNumbers = useCallback(() => {
+        if (!data) return [];
+
         const maxVisiblePages = 5;
         const pages = [];
         let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
@@ -93,7 +112,35 @@ export default function VocabularyList({ onSelectVocabulary, selectedVocabularyI
             pages.push(i);
         }
         return pages;
-    };
+    }, [currentPage, data]);
+
+    if (isLoading || isMeaningCountsLoading) {
+        return (
+            <div className="space-y-4">
+                {[...Array(5)].map((_, index) => (
+                    <div key={index} className="animate-pulse">
+                        <div className="h-24 bg-gray-200 rounded-lg"></div>
+                    </div>
+                ))}
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="text-center text-red-600 p-4">
+                단어를 불러오는데 실패했습니다: {error.message}
+            </div>
+        );
+    }
+
+    if (!data?.items || data.items.length === 0) {
+        return (
+            <div className="text-center text-gray-500 p-4">
+                {searchQuery ? '검색 결과가 없습니다' : '등록된 단어가 없습니다'}
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6">
@@ -118,7 +165,7 @@ export default function VocabularyList({ onSelectVocabulary, selectedVocabularyI
                                 <div className="flex items-center space-x-4 text-sm text-gray-500">
                                     <span className="flex items-center">
                                         <Book className="h-4 w-4 mr-1" />
-                                        {vocabulary.meanings.length} 의미
+                                        {meaningCounts?.[vocabulary.vocabulary_id] ?? 0} 의미
                                     </span>
                                     <span className="flex items-center">
                                         <Calendar className="h-4 w-4 mr-1" />
@@ -133,15 +180,17 @@ export default function VocabularyList({ onSelectVocabulary, selectedVocabularyI
                                         onEdit(vocabulary.vocabulary_id);
                                     }}
                                     className="p-1 text-gray-400 hover:text-gray-500"
+                                    aria-label="단어 수정"
                                 >
                                     <Edit2 className="h-4 w-4" />
                                 </button>
                                 <button
-                                    onClick={(e) => {
+                                    onClick={async (e) => {
                                         e.stopPropagation();
-                                        onDelete(vocabulary.vocabulary_id);
+                                        await onDelete(vocabulary.vocabulary_id);
                                     }}
                                     className="p-1 text-gray-400 hover:text-red-500"
+                                    aria-label="단어 삭제"
                                 >
                                     <Trash2 className="h-4 w-4" />
                                 </button>

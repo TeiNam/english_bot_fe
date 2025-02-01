@@ -48,6 +48,16 @@ export const Layout = () => {
                     Grammar
                   </Link>
                   <Link
+                      to="/opic"
+                      className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                          pathname === '/opic'
+                              ? 'border-indigo-500 text-gray-900'
+                              : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                      }`}
+                  >
+                    OPic
+                  </Link>
+                  <Link
                       to="/manage"
                       className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                           pathname === '/manage'

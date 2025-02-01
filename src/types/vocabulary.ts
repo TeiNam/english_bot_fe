@@ -30,3 +30,7 @@ export interface VocabularyResponse {
     has_next: boolean;
     has_prev: boolean;
 }
+
+export interface MeaningCounts {
+    [vocabularyId: number]: number;
+}

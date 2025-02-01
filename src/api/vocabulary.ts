@@ -100,3 +100,36 @@ export const searchVocabularies = async (query: string, page: number = 1, size: 
         throw error;
     }
 };
+
+export const getVocabularyMeaningCountsByIds = async (
+    vocabularyIds: number[]
+): Promise<Record<number, number>> => {
+    if (!vocabularyIds.length) return {};  // 빈 배열일 경우 빈 객체 반환
+
+    const token = useAuthStore.getState().token;
+    try {
+        const response = await apiClient.get<Record<number, number>>('/api/v1/vocabulary/meanings/counts', {
+            params: { vocabulary_ids: vocabularyIds },  // 배열을 직접 전달
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Accept': 'application/json'
+            },
+            paramsSerializer: params => {
+                // vocabulary_ids[]={id} 형식으로 직렬화
+                return Object.entries(params)
+                    .map(([key, value]) => {
+                        if (Array.isArray(value)) {
+                            return value.map(v => `${key}=${v}`).join('&');
+                        }
+                        return `${key}=${value}`;
+                    })
+                    .join('&');
+            }
+        });
+
+        return response.data;  // 이미 올바른 형식으로 반환되므로 추가 변환 불필요
+    } catch (error) {
+        console.error('Error fetching meaning counts:', error);
+        throw error;
+    }
+};

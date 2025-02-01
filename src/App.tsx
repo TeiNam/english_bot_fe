@@ -4,6 +4,7 @@ import { Layout } from './components/Layout';
 import { Learn } from './pages/Learn';
 import { Manage } from './pages/Manage';
 import { Grammar } from './pages/Grammar.tsx';
+import { Opic } from './pages/Opic';
 import { Vocabulary } from './pages/Vocabulary';
 import { useAuthStore } from './store/authStore';
 
@@ -21,6 +22,7 @@ function App() {
                 <Route path="learn" element={<Learn />} />
                 <Route path="vocabulary" element={<Vocabulary />} />
                 <Route path="grammar" element={<Grammar />} />
+                <Route path="opic" element={<Opic />} />
                 <Route path="manage" element={<Manage />} />
                 <Route path="*" element={<Navigate to="/learn" replace />} />
             </Route>

@@ -104,36 +104,7 @@ export const VocabularyDetail = ({ vocabularyId, onClose }: Props) => {
     return (
         <div className="bg-white rounded-lg shadow-lg">
             <div className="p-6 border-b border-gray-200">
-                <div className="flex justify-between items-start">
-                    <div>
-                        <h2 className="text-2xl font-bold text-gray-900">{vocabulary.word}</h2>
-                        {(vocabulary.past_tense || vocabulary.past_participle) && (
-                            <div className="mt-2 text-sm text-gray-600">
-                                {vocabulary.past_tense && <span>과거형: {vocabulary.past_tense}</span>}
-                                {vocabulary.past_tense && vocabulary.past_participle && <span className="mx-2">|</span>}
-                                {vocabulary.past_participle && <span>과거분사: {vocabulary.past_participle}</span>}
-                            </div>
-                        )}
-                        {vocabulary.rule && (
-                            <div className="mt-1">
-                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                    vocabulary.rule === '규칙' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                                }`}>
-                                    {vocabulary.rule}
-                                </span>
-                            </div>
-                        )}
-                    </div>
-                    <button
-                        onClick={onClose}
-                        className="text-gray-400 hover:text-gray-500"
-                    >
-                        <span className="sr-only">닫기</span>
-                        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
+                {/* 단어 제목 부분 */}
             </div>
 
             <div className="p-6">
@@ -154,11 +125,11 @@ export const VocabularyDetail = ({ vocabularyId, onClose }: Props) => {
                     </button>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-4 max-h-[calc(100vh-400px)] overflow-y-auto">
                     {vocabulary.meanings.map((meaning) => (
                         <div
                             key={meaning.meaning_id}
-                            className="border-l-4 border-indigo-200 pl-4 py-2 relative"
+                            className="border-l-4 border-indigo-200 pl-4 py-2 relative hover:bg-gray-50 transition-colors"
                         >
                             <div className="absolute top-2 right-2 flex space-x-2">
                                 <button
