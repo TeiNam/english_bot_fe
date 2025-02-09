@@ -18,6 +18,16 @@ export const Layout = () => {
               <div className="flex">
                 <div className="flex space-x-8">
                   <Link
+                      to="/practice"
+                      className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                          pathname === '/practice'
+                              ? 'border-indigo-500 text-gray-900'
+                              : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                      }`}
+                  >
+                    Practice
+                  </Link>
+                  <Link
                       to="/learn"
                       className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                           pathname === '/learn'

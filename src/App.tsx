@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { LoginForm } from './components/LoginForm';
 import { Layout } from './components/Layout';
+import { Practice } from './pages/Practice';
 import { Learn } from './pages/Learn';
 import { Manage } from './pages/Manage';
 import { Grammar } from './pages/Grammar.tsx';
@@ -19,6 +20,7 @@ function App() {
             />
             <Route path="/" element={<Layout />}>
                 <Route index element={<Navigate to="/learn" replace />} />
+                <Route path="practice" element={<Practice />} />
                 <Route path="learn" element={<Learn />} />
                 <Route path="vocabulary" element={<Vocabulary />} />
                 <Route path="grammar" element={<Grammar />} />
