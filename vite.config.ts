@@ -1,23 +1,45 @@
 // vite.config.ts
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 
-export default defineConfig({
-  plugins: [react()],
-  optimizeDeps: {
-    exclude: ['lucide-react'],
-  },
-  build: {
-    sourcemap: true,
-  },
-  server: {
-    proxy: {
-      '/api': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
+export default defineConfig(({ mode }) => {
+  // 환경 변수 로드
+  const env = loadEnv(mode, process.cwd(), '');
+  const apiUrl = env.VITE_API_URL || 'http://localhost:8000';
+
+  return {
+    plugins: [react()],
+    server: {
+      proxy: {
+        '/api/v1': {
+          target: apiUrl,
+          changeOrigin: true,
+          secure: false,
+          rewrite: (path) => path.replace(/^\/api\/v1/, '/api/v1')
+        }
+      },
+      host: true,
+      port: 5173,
+      watch: {
+        usePolling: true // Docker 환경에서의 HMR을 위해 필요
+      },
+      historyApiFallback: true,
+    },
+    build: {
+      sourcemap: true,
+      outDir: 'dist',
+      assetsDir: 'assets',
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            vendor: ['react', 'react-dom', 'react-router-dom'],
+            ui: ['@tanstack/react-query', 'zustand', 'axios']
+          }
+        }
       }
     },
-    historyApiFallback: true  // 추가
-  }
+    optimizeDeps: {
+      exclude: ['lucide-react']
+    }
+  };
 });

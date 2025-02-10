@@ -6,15 +6,14 @@ const axiosClient = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
+    timeout: 10000,
 });
 
 // 요청 인터셉터
 axiosClient.interceptors.request.use(
     (config) => {
-        // HTTPS 환경에서 추가 설정이 필요한 경우
-        if (config.url?.startsWith('https')) {
-            config.headers['X-Requested-With'] = 'XMLHttpRequest';
-        }
+        // CORS 관련 헤더 추가
+        config.headers['X-Requested-With'] = 'XMLHttpRequest';
         return config;
     },
     (error) => {
@@ -27,8 +26,11 @@ axiosClient.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            // 인증 에러 처리
             console.error('Authentication error:', error);
+        } else if (error.code === 'ECONNABORTED') {
+            console.error('Request timeout:', error);
+        } else {
+            console.error('API error:', error);
         }
         return Promise.reject(error);
     }
