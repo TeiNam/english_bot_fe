@@ -1,19 +1,28 @@
-import axios from 'axios';
-import { config } from '../config';
+// axiosClient.ts
+import axios, { InternalAxiosRequestConfig } from 'axios';
+import { useAuthStore } from '../store/authStore';
 
 const axiosClient = axios.create({
-    baseURL: config.apiUrl,
+    baseURL: '/api/v1',
     headers: {
         'Content-Type': 'application/json',
     },
     timeout: 10000,
 });
 
-// 요청 인터셉터
 axiosClient.interceptors.request.use(
-    (config) => {
-        // CORS 관련 헤더 추가
+    (config: InternalAxiosRequestConfig) => {
+        config.headers = config.headers || {};
+
+        config.headers['Content-Type'] = 'application/json';
+        config.headers['Accept'] = 'application/json';
         config.headers['X-Requested-With'] = 'XMLHttpRequest';
+
+        const token = useAuthStore.getState().token;
+        if (token) {
+            config.headers['Authorization'] = `Bearer ${token}`;
+        }
+
         return config;
     },
     (error) => {
@@ -21,12 +30,14 @@ axiosClient.interceptors.request.use(
     }
 );
 
-// 응답 인터셉터
 axiosClient.interceptors.response.use(
-    (response) => response,
-    (error) => {
+    response => response,
+    error => {
         if (error.response?.status === 401) {
-            console.error('Authentication error:', error);
+            const authStore = useAuthStore.getState();
+            authStore.logout();
+            window.location.href = '/login';
+            return Promise.reject(new Error('Session expired. Please login again.'));
         } else if (error.code === 'ECONNABORTED') {
             console.error('Request timeout:', error);
         } else {
