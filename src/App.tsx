@@ -16,17 +16,17 @@ function App() {
         <Routes>
             <Route
                 path="/login"
-                element={token ? <Navigate to="/learn" replace /> : <LoginForm />}
+                element={token ? <Navigate to="/practice" replace /> : <LoginForm />}
             />
             <Route path="/" element={<Layout />}>
-                <Route index element={<Navigate to="/learn" replace />} />
+                <Route index element={<Navigate to="/practice" replace />} />
                 <Route path="practice" element={<Practice />} />
                 <Route path="learn" element={<Learn />} />
                 <Route path="vocabulary" element={<Vocabulary />} />
                 <Route path="grammar" element={<Grammar />} />
                 <Route path="opic" element={<Opic />} />
                 <Route path="manage" element={<Manage />} />
-                <Route path="*" element={<Navigate to="/learn" replace />} />
+                <Route path="*" element={<Navigate to="/practice" replace />} />
             </Route>
         </Routes>
     );

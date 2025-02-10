@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { SmallTalkList } from '../components/SmallTalkList';
-import { SmallTalkDetail } from '../components/SmallTalkDetail';
 import { ManageSmallTalkForm } from '../components/ManageSmallTalkForm';
 import { ManageAnswerForm } from '../components/ManageAnswerForm';
 import { getSmallTalk, deleteSmallTalk } from '../api/smallTalk';
@@ -70,35 +69,39 @@ export const Learn = () => {
         }
     };
 
+    // Learn.tsx
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div>
-                <div className="h-[32px] flex justify-between items-center">
-                    <h1 className="text-2xl font-bold text-gray-900">English Sentences</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 px-4 md:px-6">
+            {/* 첫 번째 컬럼 - 리스트 */}
+            <div className="w-full mb-4 md:mb-0">
+                <div className="h-[32px] flex justify-between items-center mb-4">
+                    <h1 className="text-xl md:text-2xl font-bold text-gray-900">English Sentences</h1>
                     <button
                         onClick={() => {
                             setEditingSmallTalk(null);
                             setIsSmallTalkFormOpen(true);
                         }}
-                        className="flex items-center px-4 py-1.5 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        className="flex items-center px-3 py-1.5 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                     >
-                        <Plus className="h-4 w-4 mr-2" />
-                        새 문장
+                        <Plus className="h-4 w-4 mr-1" />
+                        <span className="hidden md:inline">새 문장</span>
+                        <span className="md:hidden">추가</span>
                     </button>
                 </div>
-                <div className="h-[20px]" />
                 <SmallTalkList
                     onSelectTalk={setSelectedTalkId}
                     selectedTalkId={selectedTalkId}
                 />
             </div>
-            <div className="lg:sticky lg:top-6">
-                <div className="h-[52px]" />
+
+            {/* 두 번째 컬럼 - 상세 */}
+            <div className="w-full md:sticky md:top-6">
+                <div className="h-[20px] md:h-[52px]" />
                 {selectedTalkId && selectedTalk ? (
                     <div className="bg-white rounded-lg shadow-lg">
-                        <div className="p-6 border-b border-gray-200">
+                        <div className="p-4 md:p-6 border-b border-gray-200">
                             <div className="flex justify-between items-start mb-4">
-                                <h2 className="text-xl font-semibold text-gray-900">
+                                <h2 className="text-lg md:text-xl font-semibold text-gray-900">
                                     {selectedTalk.eng_sentence}
                                 </h2>
                                 <div className="flex space-x-2">
@@ -129,9 +132,9 @@ export const Learn = () => {
                             )}
                         </div>
 
-                        <div className="p-6">
+                        <div className="p-4 md:p-6">
                             <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-lg font-medium text-gray-900 flex items-center">
+                                <h3 className="text-base md:text-lg font-medium text-gray-900 flex items-center">
                                     <MessageCircle className="h-5 w-5 mr-2" />
                                     답변 목록
                                 </h3>
@@ -143,7 +146,8 @@ export const Learn = () => {
                                     className="flex items-center px-3 py-1 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                 >
                                     <Plus className="h-4 w-4 mr-1" />
-                                    답변 추가
+                                    <span className="hidden md:inline">답변 추가</span>
+                                    <span className="md:hidden">추가</span>
                                 </button>
                             </div>
 
@@ -183,16 +187,16 @@ export const Learn = () => {
                         </div>
                     </div>
                 ) : (
-                    <div className="bg-gray-50 rounded-lg p-6 text-center text-gray-500">
+                    <div className="bg-gray-50 rounded-lg p-4 md:p-6 text-center text-gray-500">
                         Select a sentence to view details
                     </div>
                 )}
             </div>
 
-            {/* Modals */}
+            {/* 모달 */}
             {isSmallTalkFormOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-lg max-w-lg w-full p-6">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 md:p-4 z-50">
+                    <div className="bg-white rounded-lg w-full max-w-lg mx-2 p-4 md:p-6 max-h-[90vh] overflow-y-auto">
                         <h2 className="text-xl font-semibold mb-4">
                             {editingSmallTalk ? '문장 수정' : '새 문장 등록'}
                         </h2>
@@ -208,8 +212,8 @@ export const Learn = () => {
             )}
 
             {isAnswerFormOpen && selectedTalkId && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-lg max-w-lg w-full p-6">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 md:p-4 z-50">
+                    <div className="bg-white rounded-lg w-full max-w-lg mx-2 p-4 md:p-6 max-h-[90vh] overflow-y-auto">
                         <h2 className="text-xl font-semibold mb-4">
                             {editingAnswer ? '답변 수정' : '새 답변 등록'}
                         </h2>
