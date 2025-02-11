@@ -24,7 +24,7 @@ export const LoginForm = () => {
 
       // 약간의 지연 후 네비게이션 실행
       setTimeout(() => {
-        navigate('/learn', { replace: true });
+        navigate('/Practice', { replace: true });
       }, 100);
     } catch (err) {
       console.error('Login error:', err); // 디버깅용 로그

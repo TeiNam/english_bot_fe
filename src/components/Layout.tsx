@@ -28,6 +28,16 @@ export const Layout = () => {
                     Practice
                   </Link>
                   <Link
+                      to="/chat"
+                      className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                          pathname === '/chat'
+                              ? 'border-indigo-500 text-gray-900'
+                              : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                      }`}
+                  >
+                    Chat
+                  </Link>
+                  <Link
                       to="/learn"
                       className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                           pathname === '/learn'
@@ -47,7 +57,7 @@ export const Layout = () => {
                   >
                     Vocabulary
                   </Link>
-                  <Link
+                                    <Link
                       to="/grammar"
                       className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                           pathname === '/grammar'
