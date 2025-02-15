@@ -1,7 +1,7 @@
 import { useQuery, keepPreviousData, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getDiaries, deleteDiary } from '../api/diary';
 import { Calendar, ChevronLeft, ChevronRight, Trash2, Sparkles, Loader2, Edit2 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Diary } from '../types/diary';
 
 interface Props {
@@ -10,7 +10,7 @@ interface Props {
 
 export const DiaryList = ({ onEdit }: Props) => {
     const [currentPage, setCurrentPage] = useState(1);
-    const [analyzingDiaryId, setAnalyzingDiaryId] = useState<number | null>(null);
+    const [expandedDiaryIds, setExpandedDiaryIds] = useState<Set<number>>(new Set());
     const pageSize = 10;
     const queryClient = useQueryClient();
 
@@ -29,21 +29,6 @@ export const DiaryList = ({ onEdit }: Props) => {
         }
     });
 
-    const handleAIFeedback = async (diaryId: number, body: string) => {
-        if (analyzingDiaryId) return;
-
-        setAnalyzingDiaryId(diaryId);
-        try {
-            // TODO: Implement AI feedback API call
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            // const feedback = await getAIFeedback(body);
-        } catch (error) {
-            console.error('AI feedback failed:', error);
-        } finally {
-            setAnalyzingDiaryId(null);
-        }
-    };
-
     const handleDelete = async (diaryId: number) => {
         if (window.confirm('정말로 이 일기를 삭제하시겠습니까?')) {
             try {
@@ -53,6 +38,25 @@ export const DiaryList = ({ onEdit }: Props) => {
                 alert('일기 삭제에 실패했습니다.');
             }
         }
+    };
+
+    // 최신 일기를 자동으로 펼치기
+    useEffect(() => {
+        if (data?.items?.length > 0) {
+            setExpandedDiaryIds(new Set([data.items[0].diary_id]));
+        }
+    }, [data?.items]);
+
+    const toggleDiary = (diaryId: number) => {
+        setExpandedDiaryIds(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(diaryId)) {
+                newSet.delete(diaryId);
+            } else {
+                newSet.add(diaryId);
+            }
+            return newSet;
+        });
     };
 
     if (isLoading) {
@@ -78,8 +82,9 @@ export const DiaryList = ({ onEdit }: Props) => {
                 <div
                     key={diary.diary_id}
                     className="bg-white rounded-lg shadow-sm p-4 transition-all duration-200 hover:shadow-md"
+                    onClick={() => toggleDiary(diary.diary_id)}
                 >
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center justify-between">
                         <div className="flex items-center text-sm text-gray-500">
                             <Calendar className="h-4 w-4 mr-1" />
                             {new Date(diary.date).toLocaleDateString('ko-KR', {
@@ -90,42 +95,49 @@ export const DiaryList = ({ onEdit }: Props) => {
                         </div>
                         <div className="flex space-x-2">
                             <button
-                                onClick={() => onEdit(diary)}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onEdit(diary);
+                                }}
                                 className="p-1 text-gray-400 hover:text-indigo-600 transition-colors"
+                                title="일기 수정"
                             >
                                 <Edit2 className="h-4 w-4" />
                             </button>
                             <button
-                                onClick={() => handleAIFeedback(diary.diary_id, diary.body)}
-                                disabled={analyzingDiaryId === diary.diary_id}
-                                className={`p-1 transition-colors ${
-                                    analyzingDiaryId === diary.diary_id
-                                        ? 'text-indigo-400'
-                                        : 'text-gray-400 hover:text-indigo-600'
-                                }`}
-                            >
-                                {analyzingDiaryId === diary.diary_id ? (
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                ) : (
-                                    <Sparkles className="h-4 w-4" />
-                                )}
-                            </button>
-                            <button
-                                onClick={() => handleDelete(diary.diary_id)}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDelete(diary.diary_id);
+                                }}
                                 className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                                title="일기 삭제"
                             >
                                 <Trash2 className="h-4 w-4" />
                             </button>
                         </div>
                     </div>
-                    <div className="prose max-w-none">
-                        <p className="text-gray-900 whitespace-pre-wrap">{diary.body}</p>
-                    </div>
-                    {diary.feedback && (
-                        <div className="mt-3 p-3 bg-indigo-50 rounded-md">
-                            <p className="text-sm text-indigo-700 whitespace-pre-wrap">
-                                {diary.feedback}
-                            </p>
+                    {expandedDiaryIds.has(diary.diary_id) && (
+                        <div className="mt-4">
+                            <div className="prose max-w-none">
+                                <p className="text-gray-900 whitespace-pre-wrap">{diary.body}</p>
+                            </div>
+                            <div className="mt-4">
+                                {diary.feedback ? (
+                                    <div className="p-4 bg-gray-50 rounded-md border border-gray-200">
+                                        <div className="flex items-center space-x-2 mb-3">
+                                            <Sparkles className="h-4 w-4 text-gray-600" />
+                                            <span className="text-base font-medium text-gray-900">AI Feedback</span>
+                                        </div>
+                                        <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
+                                            {diary.feedback}
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <div className="text-sm text-gray-500">
+                                        AI가 현재 답변을 생성중이니 기다려 주세요
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     )}
                 </div>

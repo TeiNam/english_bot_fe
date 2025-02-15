@@ -77,3 +77,13 @@ export const deleteDiary = async (diaryId: number): Promise<void> => {
         headers: { Authorization: `Bearer ${token}` }
     });
 };
+
+export const generateFeedback = async (diaryId: number): Promise<Diary> => {
+    const token = useAuthStore.getState().token;
+    const response = await axios.post<Diary>(
+        `${API_URL}/api/v1/diary/${diaryId}/feedback`,
+        null,
+        { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return response.data;
+};
