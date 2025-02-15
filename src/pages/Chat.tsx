@@ -16,9 +16,19 @@ export const Chat = () => {
     const [isStreaming, setIsStreaming] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [messages, setMessages] = useState<string[]>([]);
+    const [tokenCount, setTokenCount] = useState(0);
+    const [cost, setCost] = useState(0);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const queryClient = useQueryClient();
     const navigate = useNavigate();
+
+    // 비용 계산: GPT-3.5 기준 $0.002 per 1000 tokens (즉, 토큰당 약 0.000002달러)
+    const COST_PER_TOKEN = 0.002 / 1000; // dollars per token
+
+    // 간단한 토큰 수 계산 함수: 대략 문자 수를 4로 나눈 값을 토큰 수로 가정
+    const approximateTokenCount = (text: string) => {
+        return Math.ceil(text.length / 4);
+    };
 
     // 대화 목록 조회
     const { data: conversations } = useQuery({
@@ -133,6 +143,13 @@ export const Chat = () => {
                 // 실시간 응답 업데이트 (간단히 상태 업데이트)
                 setMessages(prev => [...prev, chunk]);
             }
+
+            // 토큰 사용량 계산: 입력과 출력 메시지의 토큰 수를 합산
+            const inputTokens = approximateTokenCount(currentMessage);
+            const outputTokens = approximateTokenCount(collectedResponse);
+            const totalTokens = inputTokens + outputTokens;
+            setTokenCount(totalTokens);
+            setCost(totalTokens * COST_PER_TOKEN);
 
             // 대화 목록 및 히스토리 갱신
             await queryClient.invalidateQueries({ queryKey: ['conversations'] });
@@ -286,18 +303,25 @@ export const Chat = () => {
                     <div ref={messagesEndRef} />
                 </div>
 
+                {/* 토큰 및 비용 정보 표시 */}
+                {tokenCount > 0 && (
+                    <div className="text-xs text-gray-500 mt-2 px-3">
+                        토큰 사용량: {tokenCount} tokens, 비용: ${cost.toFixed(6)}
+                    </div>
+                )}
+
                 {/* 입력 영역 */}
                 <div className="p-2 border-t border-gray-200 bg-white">
                     {error && <div className="text-red-500 mb-2">{error}</div>}
                     <div className="flex space-x-4">
-            <textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value.slice(0, 2000))}
-                onKeyPress={handleKeyPress}
-                placeholder="메시지를 입력하세요..."
-                className="flex-1 min-h-[2.5rem] max-h-24 p-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-indigo-500 text-sm"
-                disabled={isStreaming}
-            />
+                        <textarea
+                            value={message}
+                            onChange={(e) => setMessage(e.target.value.slice(0, 2000))}
+                            onKeyPress={handleKeyPress}
+                            placeholder="메시지를 입력하세요..."
+                            className="flex-1 min-h-[2.5rem] max-h-24 p-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-indigo-500 text-sm"
+                            disabled={isStreaming}
+                        />
                         <button
                             onClick={handleSendMessage}
                             disabled={!message.trim() || isStreaming}
@@ -315,5 +339,3 @@ export const Chat = () => {
         </div>
     );
 };
-
-export default Chat;
