@@ -1,82 +1,40 @@
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Send, Plus, Trash2, ArrowLeft } from 'lucide-react';
-import { useAuthStore } from '../store/authStore';
+import { Send, Plus, Trash2, ArrowLeft, Loader2 } from 'lucide-react';
 import { ConversationHistory, ConversationListResponse } from '../types/chat';
-import { getConversations, getChatHistory, createConversation as createConversationApi, deleteConversation as deleteConversationApi, streamChat } from '../api/chat';
+import {
+    getConversations,
+    getChatHistory,
+    deleteConversation as deleteConversationApi,
+    streamChat
+} from '../api/chat';
 
 export const Chat = () => {
     const { conversationId } = useParams();
     const [message, setMessage] = useState('');
-    const [streamingMessage, setStreamingMessage] = useState('');
     const [isStreaming, setIsStreaming] = useState(false);
-    const [currentUserMessage, setCurrentUserMessage] = useState('');
+    const [error, setError] = useState<string | null>(null);
+    const [messages, setMessages] = useState<string[]>([]);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const queryClient = useQueryClient();
     const navigate = useNavigate();
-    const token = useAuthStore((state) => state.token);
 
     // 대화 목록 조회
     const { data: conversations } = useQuery({
         queryKey: ['conversations'],
         queryFn: getConversations,
-        staleTime: 0
+        staleTime: 1000 * 60,
+        retry: 1
     });
 
     // 현재 대화 히스토리 조회
-    const { data: chatHistory, refetch: refetchHistory } = useQuery({
+    const { data: chatHistory } = useQuery({
         queryKey: ['chatHistory', conversationId],
-        queryFn: () => conversationId ? getChatHistory(conversationId) : Promise.resolve([]),
+        queryFn: () =>
+            conversationId ? getChatHistory(conversationId) : Promise.resolve([]),
         enabled: !!conversationId,
         refetchOnWindowFocus: false
-    });
-
-    // 새 대화 생성
-    const createConversation = useMutation({
-        mutationFn: (initialMessage: string) => createConversationApi({ initial_message: initialMessage }),
-        onSuccess: async (data) => {
-            // 새 메시지 객체 생성
-            const newMessage = {
-                chat_history_id: Date.now(),
-                user_message: message,
-                bot_response: '',
-                create_at: new Date().toISOString()
-            };
-
-            // 첫 메시지를 제목으로 사용하기 위해 conversations 캐시 업데이트
-            queryClient.setQueryData(['conversations'], (old: ConversationListResponse[] | undefined) => {
-                if (!old) return [{
-                    conversation_id: data.conversation_id,
-                    title: message,
-                    status: 'active',
-                    message_count: 1,
-                    create_at: new Date().toISOString(),
-                    last_message_at: new Date().toISOString(),
-                    last_message: message,
-                    last_response: null
-                }];
-
-                return [{
-                    conversation_id: data.conversation_id,
-                    title: message,
-                    status: 'active',
-                    message_count: 1,
-                    create_at: new Date().toISOString(),
-                    last_message_at: new Date().toISOString(),
-                    last_message: message,
-                    last_response: null
-                }, ...old];
-            });
-
-            // 새 대화의 히스토리 설정
-            queryClient.setQueryData(['chatHistory', data.conversation_id], [newMessage]);
-
-            // 대화 목록 갱신
-            await queryClient.invalidateQueries({ queryKey: ['conversations'] });
-
-            navigate(`/chat/${data.conversation_id}`);
-        }
     });
 
     // 대화 삭제
@@ -88,93 +46,106 @@ export const Chat = () => {
         }
     });
 
-    // 스크롤 자동 이동
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [chatHistory, streamingMessage]);
+    }, [chatHistory]);
 
-    const handleSendMessage = async () => {
+    const handleSendMessage = useCallback(async () => {
         if (!message.trim()) return;
 
-        // 현재 메시지 저장
         const currentMessage = message;
-        setCurrentUserMessage(currentMessage);
         setMessage('');
         setIsStreaming(true);
-        setStreamingMessage('');
+        setError(null);
 
-        // 현재 대화 내역에 새 메시지 추가
+        // 임시 메시지 객체 생성 (채팅 내역 업데이트용)
         const newMessage = {
-            chat_history_id: Date.now(), // 임시 ID
+            chat_history_id: Date.now(),
             user_message: currentMessage,
             bot_response: '',
             create_at: new Date().toISOString()
         };
 
-        // 로컬 상태 업데이트
-        queryClient.setQueryData(['chatHistory', conversationId], (old: ConversationHistory[] | undefined) => {
-            return [...(old || []), newMessage];
-        });
-
         try {
+            // 스트리밍 요청: 새 대화인 경우 conversation_id는 undefined
             const response = await streamChat({
                 content: currentMessage,
-                conversation_id: conversationId
+                conversation_id: conversationId || undefined
             });
 
             if (!response.ok) throw new Error('Stream request failed');
 
+            // 새 대화인 경우 대화 ID 추출
+            let targetConversationId = conversationId;
+            if (!conversationId) {
+                // 1. 응답 객체의 커스텀 프로퍼티 (있다면)
+                const convIdFromProp = (response as any).conversationId;
+                // 2. 응답 헤더에서 추출 (헤더명은 대소문자 상관없이 접근 가능)
+                const convIdFromHeader = response.headers.get('X-Conversation-ID');
+                targetConversationId = convIdFromProp || (convIdFromHeader?.trim() || '');
+
+                // 3. 위 두 방법으로도 못 얻으면, JSON 파싱 시도 (스트리밍이 아니면 가능)
+                if (!targetConversationId) {
+                    try {
+                        const clonedResponse = response.clone();
+                        const jsonData = await clonedResponse.json();
+                        targetConversationId = jsonData.conversation_id;
+                    } catch (e) {
+                        // JSON 파싱 실패 시 별도 처리 없음
+                    }
+                }
+
+                // 4. 백업: 위 방법으로도 대화 ID를 얻지 못한 경우, 최신 대화 조회 시도
+                if (!targetConversationId) {
+                    try {
+                        const conversationsData = await getConversations();
+                        if (conversationsData && conversationsData.length > 0) {
+                            // 생성된 새 대화가 최신 대화라고 가정하고 정렬
+                            const sortedConversations = conversationsData.sort(
+                                (a: ConversationListResponse, b: ConversationListResponse) =>
+                                    new Date(b.create_at).getTime() -
+                                    new Date(a.create_at).getTime()
+                            );
+                            targetConversationId = sortedConversations[0].conversation_id;
+                        }
+                    } catch (e) {
+                        console.error('Fallback getConversations error:', e);
+                    }
+                }
+
+                if (!targetConversationId) {
+                    throw new Error('Failed to get conversation ID for new chat');
+                }
+                // 새 대화라면 URL 이동 (대화 ID 포함)
+                navigate(`/chat/${targetConversationId}`);
+            }
+
+            // 스트리밍 응답 처리
             const reader = response.body?.getReader();
             if (!reader) throw new Error('Reader not available');
 
             let collectedResponse = '';
             while (true) {
                 const { done, value } = await reader.read();
-
-                if (done) {
-                    // 스트리밍 완료 시 최종 응답으로 대화 내역 업데이트
-                    queryClient.setQueryData(['chatHistory', conversationId], (old: ConversationHistory[] | undefined) => {
-                        if (!old) return [newMessage];
-                        return old.map(msg =>
-                            msg.chat_history_id === newMessage.chat_history_id
-                                ? { ...msg, bot_response: collectedResponse }
-                                : msg
-                        );
-                    });
-                    break;
-                }
-
-                const text = new TextDecoder().decode(value);
-                collectedResponse += text;
-
-                // 스트리밍 중인 응답 업데이트
-                queryClient.setQueryData(['chatHistory', conversationId], (old: ConversationHistory[] | undefined) => {
-                    if (!old) return [newMessage];
-                    return old.map(msg =>
-                        msg.chat_history_id === newMessage.chat_history_id
-                            ? { ...msg, bot_response: collectedResponse }
-                            : msg
-                    );
-                });
+                if (done) break;
+                const chunk = new TextDecoder('utf-8').decode(value);
+                collectedResponse += chunk;
+                // 실시간 응답 업데이트 (간단히 상태 업데이트)
+                setMessages(prev => [...prev, chunk]);
             }
 
-            // 대화 목록 갱신
+            // 대화 목록 및 히스토리 갱신
+            await queryClient.invalidateQueries({ queryKey: ['conversations'] });
             await queryClient.invalidateQueries({
-                queryKey: ['conversations'],
-                exact: true
+                queryKey: ['chatHistory', targetConversationId || conversationId]
             });
-        } catch (error) {
-            console.error('Streaming error:', error);
+        } catch (err: any) {
+            console.error('Streaming error:', err);
+            setError(err.message);
         } finally {
             setIsStreaming(false);
-            setCurrentUserMessage('');
-            // 최종 대화 내역 갱신
-            await queryClient.invalidateQueries({
-                queryKey: ['chatHistory', conversationId],
-                exact: true
-            });
         }
-    };
+    }, [message, conversationId, queryClient, navigate]);
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -184,20 +155,14 @@ export const Chat = () => {
     };
 
     const handleNewChat = () => {
-        // 상태 초기화
         setMessage('');
         setIsStreaming(false);
-        setStreamingMessage('');
-        setCurrentUserMessage('');
-
-        // 새 채팅 페이지로 이동
         navigate('/chat');
     };
 
     const handleDeleteChat = async () => {
         if (!conversationId) return;
         if (window.confirm('정말로 이 대화를 삭제하시겠습니까?')) {
-            // 해당 대화의 히스토리만 제거
             queryClient.removeQueries({ queryKey: ['chatHistory', conversationId] });
             await deleteConversation.mutateAsync(conversationId);
             navigate('/chat');
@@ -225,7 +190,6 @@ export const Chat = () => {
                     <Plus className="h-4 w-4 mr-2" />
                     새 대화
                 </button>
-
                 <div className="space-y-2">
                     {conversations?.map((conv: ConversationListResponse) => (
                         <div
@@ -266,19 +230,19 @@ export const Chat = () => {
 
             {/* 메인 채팅 영역 */}
             <div className="col-span-1 md:col-span-3 flex flex-col bg-white h-full">
-                {!message && !chatHistory?.length && (
+                {!message && !chatHistory?.length && !conversationId && (
                     <div className="flex flex-col items-center justify-center h-full text-gray-500">
                         <p className="text-lg mb-2">새로운 대화를 시작하세요</p>
-                        <p className="text-sm">메시지를 입력하고 전송 버튼을 누르면 대화가 시작됩니다</p>
+                        <p className="text-sm">
+                            메시지를 입력하고 전송 버튼을 누르면 대화가 시작됩니다
+                        </p>
                     </div>
                 )}
+
                 {/* 헤더 */}
                 <div className="flex items-center justify-between p-3 border-b border-gray-200 bg-white">
-                    <div className="flex items-center">
-                        <button
-                            onClick={() => navigate('/chat')}
-                            className="md:hidden mr-2"
-                        >
+                    <div className="flex items-center space-x-4">
+                        <button onClick={() => navigate('/chat')} className="md:hidden mr-2">
                             <ArrowLeft className="h-4 w-4 text-gray-500" />
                         </button>
                         <h1 className="text-base font-semibold text-gray-900">
@@ -290,7 +254,7 @@ export const Chat = () => {
                             onClick={handleDeleteChat}
                             className="text-gray-400 hover:text-red-500"
                         >
-                            <Trash2 className="h-5 w-5" />
+                            <Trash2 className="h-5 w-5" title="대화 삭제" />
                         </button>
                     )}
                 </div>
@@ -298,20 +262,24 @@ export const Chat = () => {
                 {/* 메시지 목록 */}
                 <div className="flex-1 overflow-y-auto p-3 space-y-3 min-h-0 bg-gray-50">
                     {(chatHistory || []).map((msg: ConversationHistory) => (
-                        <div key={msg.chat_history_id} className="space-y-4">
-                            <div className="flex justify-end">
-                                <div className="bg-indigo-100 rounded-lg px-3 py-2 max-w-[85%]">
-                                    <p className="text-gray-900 whitespace-pre-wrap">
-                                        {msg.user_message}
-                                    </p>
+                        <div key={msg.chat_history_id} className="space-y-3">
+                            <div className="flex flex-col space-y-3">
+                                <div className="flex justify-end">
+                                    <div className="bg-indigo-100 rounded-lg px-3 py-2 max-w-[85%]">
+                                        <p className="text-gray-900 whitespace-pre-wrap">
+                                            {msg.user_message}
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="flex justify-start">
-                                <div className="bg-white rounded-lg px-3 py-2 max-w-[85%] shadow-sm">
-                                    <p className="text-gray-900 whitespace-pre-wrap">
-                                        {msg.bot_response}
-                                    </p>
-                                </div>
+                                {msg.bot_response && (
+                                    <div className="flex justify-start">
+                                        <div className="bg-white rounded-lg px-3 py-2 max-w-[85%] shadow-sm">
+                                            <p className="text-gray-900 whitespace-pre-wrap">
+                                                {msg.bot_response}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ))}
@@ -320,22 +288,23 @@ export const Chat = () => {
 
                 {/* 입력 영역 */}
                 <div className="p-2 border-t border-gray-200 bg-white">
+                    {error && <div className="text-red-500 mb-2">{error}</div>}
                     <div className="flex space-x-4">
-                        <textarea
-                            value={message}
-                            onChange={(e) => setMessage(e.target.value)}
-                            onKeyPress={handleKeyPress}
-                            placeholder="메시지를 입력하세요..."
-                            className="flex-1 min-h-[2.5rem] max-h-24 p-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-indigo-500 text-sm"
-                            disabled={isStreaming}
-                        />
+            <textarea
+                value={message}
+                onChange={(e) => setMessage(e.target.value.slice(0, 2000))}
+                onKeyPress={handleKeyPress}
+                placeholder="메시지를 입력하세요..."
+                className="flex-1 min-h-[2.5rem] max-h-24 p-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-indigo-500 text-sm"
+                disabled={isStreaming}
+            />
                         <button
-                            onClick={conversationId ? handleSendMessage : () => createConversation.mutate(message)}
+                            onClick={handleSendMessage}
                             disabled={!message.trim() || isStreaming}
                             className="p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center w-10"
                         >
                             {isStreaming ? (
-                                <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                <Loader2 className="h-4 w-4 animate-spin" />
                             ) : (
                                 <Send className="h-4 w-4" />
                             )}
@@ -346,3 +315,5 @@ export const Chat = () => {
         </div>
     );
 };
+
+export default Chat;
