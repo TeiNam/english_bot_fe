@@ -1,11 +1,11 @@
 import { BotControlPanel } from '../components/BotControlPanel';
+import { PromptList } from '../components/PromptList';
 
 export const Manage = () => {
     return (
         <div className="space-y-6">
-            <div className="h-[32px] flex items-center">
-                <h1 className="text-2xl font-bold text-gray-900">Bot Status</h1>
-            </div>
+            <PromptList />
+            <h2 className="text-xl font-bold text-gray-900">Bot Status</h2>
             <BotControlPanel />
         </div>
     );
