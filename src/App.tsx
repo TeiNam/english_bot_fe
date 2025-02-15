@@ -8,6 +8,7 @@ import { Manage } from './pages/Manage';
 import { Grammar } from './pages/Grammar.tsx';
 import { Opic } from './pages/Opic';
 import { Vocabulary } from './pages/Vocabulary';
+import { Diary } from './pages/Diary';
 import { useAuthStore } from './store/authStore';
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
                 <Route path="chat/:conversationId" element={<Chat />} />
                 <Route path="grammar" element={<Grammar />} />
                 <Route path="opic" element={<Opic />} />
+                <Route path="diary" element={<Diary />} />
                 <Route path="manage" element={<Manage />} />
                 <Route path="*" element={<Navigate to="/practice" replace />} />
             </Route>
