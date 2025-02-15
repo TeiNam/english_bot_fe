@@ -36,3 +36,10 @@ export const updatePrompt = async (promptId: number, data: Partial<Prompt>): Pro
     });
     return response.data;
 };
+
+export const deletePrompt = async (promptId: number): Promise<void> => {
+    const token = useAuthStore.getState().token;
+    await axios.delete(`${API_URL}/api/v1/chat/prompts/templates/${promptId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+};
