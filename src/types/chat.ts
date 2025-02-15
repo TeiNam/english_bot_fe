@@ -29,3 +29,13 @@ export interface ConversationResponse {
     conversation_id: string;
     chat_history_id: number;
 }
+
+export interface ChatSettings {
+    user_id: number;
+    default_prompt_template_id: number;
+    model: string;
+    temperature: number;
+    max_tokens: number;
+    create_at: string;
+    update_at: string;
+}

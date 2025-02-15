@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Send, Plus, Trash2, ArrowLeft, Loader2 } from 'lucide-react';
 import { ConversationHistory, ConversationListResponse } from '../types/chat';
+import { ChatSettings } from '../components/ChatSettings';
 import {
     getConversations,
     getChatHistory,
@@ -217,13 +218,16 @@ export const Chat = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 h-[calc(100vh-8rem)] bg-white">
             {/* Sidebar */}
             <div className="hidden md:flex flex-col bg-white p-4 border-r border-gray-200 overflow-y-auto h-full">
-                <button
-                    onClick={handleNewChat}
-                    className="flex items-center justify-center px-4 py-2 mb-4 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
-                >
-                    <Plus className="h-4 w-4 mr-2" />
-                    새 대화
-                </button>
+                <div className="flex space-x-2 mb-4">
+                    <ChatSettings />
+                    <button
+                        onClick={handleNewChat}
+                        className="flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
+                    >
+                        <Plus className="h-4 w-4 mr-2" />
+                        새 대화
+                    </button>
+                </div>
                 <div className="space-y-2">
                     {conversations?.map((conv: ConversationListResponse) => (
                         <div

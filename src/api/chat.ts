@@ -120,3 +120,19 @@ export const streamChat = async (data: ChatMessage): Promise<Response> => {
         throw error;
     }
 };
+
+export const getChatSettings = async (): Promise<ChatSettings> => {
+    const token = useAuthStore.getState().token;
+    const response = await axios.get<ChatSettings>(`${API_URL}/api/v1/chat/settings`, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+};
+
+export const updateChatSettings = async (settings: Partial<ChatSettings>): Promise<ChatSettings> => {
+    const token = useAuthStore.getState().token;
+    const response = await axios.put<ChatSettings>(`${API_URL}/api/v1/chat/settings`, settings, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+};
