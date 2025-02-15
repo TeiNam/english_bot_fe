@@ -9,14 +9,14 @@ import {
     deleteConversation as deleteConversationApi,
     streamChat
 } from '../api/chat';
-import "../index.css"; // CSS 파일의 경로를 실제 위치에 맞게 수정하세요
+import "../index.css"; // CSS 파일 경로 (실제 위치에 맞게 수정)
 
 export const Chat = () => {
     const { conversationId } = useParams();
     const [message, setMessage] = useState('');
     const [isStreaming, setIsStreaming] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [typedMessage, setTypedMessage] = useState<string>(''); // 타이핑 효과로 보여줄 텍스트
+    const [typedMessage, setTypedMessage] = useState<string>(''); // 타이핑 효과 텍스트
     const [localMessages, setLocalMessages] = useState<ConversationHistory[]>([]);
     const [tokenCount, setTokenCount] = useState(0);
     const [cost, setCost] = useState(0);
@@ -57,23 +57,19 @@ export const Chat = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [chatHistory, typedMessage]);
 
-    // 자연스러운 타이핑 효과 함수
+    // 자연스러운 타이핑 효과 함수 (단어 단위)
     const simulateNaturalTyping = async (text: string) => {
         setTypedMessage(''); // 기존 텍스트 초기화
         const words = text.split(' ');
         for (let word of words) {
             setTypedMessage(prev => (prev ? prev + ' ' + word : word));
-
-            // 기본 딜레이를 10 ~ 50ms 사이의 랜덤 값으로 설정
+            // 기본 딜레이: 20~40ms 랜덤, 구두점이 있으면 추가 딜레이
             let delay = Math.floor(Math.random() * 20) + 20;
-
-            // 단어가 마침표, 물음표, 느낌표로 끝나면 조금 더 긴 딜레이
             if (word.endsWith('.') || word.endsWith('?') || word.endsWith('!')) {
                 delay += 300;
             } else if (word.endsWith(',') || word.endsWith(';')) {
                 delay += 150;
             }
-
             await new Promise(resolve => setTimeout(resolve, delay));
         }
     };
@@ -107,7 +103,7 @@ export const Chat = () => {
             });
             if (!response.ok) throw new Error('Stream request failed');
 
-            // 새 대화인 경우 대화 ID 추출 (생략된 로직 필요 시 추가)
+            // 새 대화인 경우 대화 ID 추출 (필요시 추가 로직)
             let targetConversationId = conversationId;
             if (!conversationId) {
                 const convIdFromProp = (response as any).conversationId;
@@ -155,7 +151,7 @@ export const Chat = () => {
             }
             decoder.decode();
 
-            // 전체 응답을 자연스러운 타이핑 효과로 출력 (simulateNaturalTyping 함수 호출)
+            // 전체 응답을 자연스러운 타이핑 효과로 출력
             await simulateNaturalTyping(fullResponse);
 
             // 토큰 사용량 및 비용 계산
@@ -217,7 +213,8 @@ export const Chat = () => {
     };
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 h-[calc(100vh-4rem)] bg-white">
+        // 전체 그리드 컨테이너의 높이를 줄여서 입력 영역이 보이도록 수정 (h-[calc(100vh-8rem)])
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 h-[calc(100vh-8rem)] bg-white">
             {/* Sidebar */}
             <div className="hidden md:flex flex-col bg-white p-4 border-r border-gray-200 overflow-y-auto h-full">
                 <button
