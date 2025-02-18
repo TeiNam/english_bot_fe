@@ -24,5 +24,6 @@ export interface DiaryCreate {
 
 export interface DiaryUpdate {
     body: string;
+    date: string | null;
     feedback?: string;
 }

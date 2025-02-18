@@ -44,8 +44,10 @@ export const DiaryEditor = ({ initialDiary, onSaved }: Props) => {
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, data }: { id: number; data: { body: string; date?: string } }) =>
-            updateDiary(id, data),
+        mutationFn: ({ id, data }: { id: number; data: { body: string; date?: string | null } }) => {
+            console.log('Updating diary with:', { id, data });
+            return updateDiary(id, data);
+        },
         onSuccess: async (data) => {
             queryClient.invalidateQueries({ queryKey: ['diaries'] });
             if (initialDiary) {
@@ -65,7 +67,10 @@ export const DiaryEditor = ({ initialDiary, onSaved }: Props) => {
         if (initialDiary) {
             updateMutation.mutate({
                 id: initialDiary.diary_id,
-                data: { body, date: selectedDate }
+                data: {
+                    body,
+                    date: isDateEditable ? selectedDate : null
+                }
             });
         } else {
             createMutation.mutate({
