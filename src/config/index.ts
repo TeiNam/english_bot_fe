@@ -10,6 +10,8 @@ const getApiUrl = () => {
 
 export const config = {
     apiUrl: getApiUrl(),
-    timeout: 30000, // 30 seconds
-    retries: 3,
+    timeout: 60000, // 60 seconds
+    retries: 5,
+    maxBackoffDelay: 30000, // 30 seconds maximum backoff delay
+    initialBackoffDelay: 1000, // 1 second initial backoff delay
 };

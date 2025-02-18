@@ -4,14 +4,14 @@ import { config } from '../config';
 
 const axiosClient = axios.create({
     baseURL: `${config.apiUrl}/api/v1`,
-    timeout: config.timeout,
+    timeout: config.timeout, // 60 seconds
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
     },
 });
 
-let retryCount = 0;
+const retryState = new Map();
 
 axiosClient.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
@@ -32,22 +32,42 @@ axiosClient.interceptors.request.use(
 
 axiosClient.interceptors.response.use(
     response => {
-        retryCount = 0; // Reset retry count on successful response
+        // Reset retry count for this request URL on success
+        if (response.config.url) {
+            retryState.delete(response.config.url);
+        }
         return response;
     },
     async error => {
         const originalRequest = error.config;
+        const requestUrl = originalRequest?.url;
+
+        if (!requestUrl) {
+            return Promise.reject(error);
+        }
+
+        // Get or initialize retry count for this URL
+        let retryCount = retryState.get(requestUrl) || 0;
 
         // Connection refused or network error
         if (error.code === 'ECONNREFUSED' || error.message.includes('Network Error')) {
             if (retryCount < config.retries) {
                 retryCount++;
-                const backoffDelay = Math.min(1000 * Math.pow(2, retryCount), 10000);
+                retryState.set(requestUrl, retryCount);
+
+                // Calculate backoff delay with exponential backoff and jitter
+                const backoffDelay = Math.min(
+                    config.initialBackoffDelay * Math.pow(2, retryCount - 1) * (1 + Math.random() * 0.1),
+                    config.maxBackoffDelay
+                );
 
                 console.log(`Retrying request (${retryCount}/${config.retries}) after ${backoffDelay}ms`);
 
                 await new Promise(resolve => setTimeout(resolve, backoffDelay));
                 return axiosClient(originalRequest);
+            } else {
+                // Clean up retry state when max retries reached
+                retryState.delete(requestUrl);
             }
         }
 
