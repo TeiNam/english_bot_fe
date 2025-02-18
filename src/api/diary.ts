@@ -1,17 +1,8 @@
-import axios from 'axios';
+import axiosClient from './axiosClient';
 import { Diary, PageResponse, DiaryCreate, DiaryUpdate } from '../types/diary';
-import { useAuthStore } from '../store/authStore';
-import { config } from '../config';
-
-const API_URL = config.apiUrl;
 
 export const getDiaries = async (page: number = 1, size: number = 10): Promise<PageResponse<Diary>> => {
-    const token = useAuthStore.getState().token;
-    const response = await axios.get<PageResponse<Diary>>(`${API_URL}/api/v1/diary`, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        },
+    const response = await axiosClient.get<PageResponse<Diary>>('/diary', {
         params: {
             page: Math.max(1, Math.floor(page)),
             size: Math.max(1, Math.floor(size))
@@ -21,69 +12,46 @@ export const getDiaries = async (page: number = 1, size: number = 10): Promise<P
 };
 
 export const getDiary = async (diaryId: number): Promise<Diary> => {
-    const token = useAuthStore.getState().token;
-    const response = await axios.get<Diary>(`${API_URL}/api/v1/diary/${diaryId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-    });
+    const response = await axiosClient.get<Diary>(`/diary/${diaryId}`);
     return response.data;
 };
 
 export const getDiaryByDate = async (date: string): Promise<Diary> => {
-    const token = useAuthStore.getState().token;
-    const response = await axios.get<Diary>(`${API_URL}/api/v1/diary/date/${date}`, {
-        headers: { Authorization: `Bearer ${token}` }
-    });
+    const response = await axiosClient.get<Diary>(`/diary/date/${date}`);
     return response.data;
 };
 
 export const createDiary = async (data: DiaryCreate): Promise<Diary> => {
-    const token = useAuthStore.getState().token;
     console.log('Request data:', data);  // 요청 데이터 확인
 
     try {
-        const response = await axios.post<Diary>(
-            `${API_URL}/api/v1/diary`,
-            data,
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            }
-        );
+        const response = await axiosClient.post<Diary>('/diary', data);
         console.log('Response:', response.data);  // 응답 데이터 확인
         return response.data;
     } catch (error) {
-        if (axios.isAxiosError(error)) {
-            console.log('Error response:', error.response?.data);  // 에러 응답 데이터 확인
-        }
+        console.log('Error response:', error);  // 에러 응답 데이터 확인
         throw error;
     }
 };
 
 export const updateDiary = async (diaryId: number, data: DiaryUpdate): Promise<Diary> => {
-    const token = useAuthStore.getState().token;
-    const response = await axios.put<Diary>(
-        `${API_URL}/api/v1/diary/${diaryId}`,
+    console.log('Updating diary with data:', { diaryId, data });
+    const response = await axiosClient.put<Diary>(
+        `/diary/${diaryId}`,
         data,
-        { headers: { Authorization: `Bearer ${token}` } }
     );
+    console.log('Update diary response:', response.data);
     return response.data;
 };
 
 export const deleteDiary = async (diaryId: number): Promise<void> => {
-    const token = useAuthStore.getState().token;
-    await axios.delete(`${API_URL}/api/v1/diary/${diaryId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-    });
+    await axiosClient.delete(`/diary/${diaryId}`);
 };
 
 export const generateFeedback = async (diaryId: number): Promise<Diary> => {
-    const token = useAuthStore.getState().token;
-    const response = await axios.post<Diary>(
-        `${API_URL}/api/v1/diary/${diaryId}/feedback`,
+    const response = await axiosClient.post<Diary>(
+        `/diary/${diaryId}/feedback`,
         null,
-        { headers: { Authorization: `Bearer ${token}` } }
     );
     return response.data;
 };

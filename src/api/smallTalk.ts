@@ -1,21 +1,5 @@
 import axiosClient from './axiosClient';
-import { SmallTalk, SmallTalkResponse } from '../types/smallTalk';
-
-export interface SentenceResponse {
-    data: {
-        talk_id: number;
-        eng_sentence: string;
-        kor_sentence: string | null;
-        parenthesis: string | null;
-        tag: string | null;
-    };
-    navigation: {
-        has_prev: boolean;
-        has_next: boolean;
-        prev_id: number | null;
-        next_id: number;
-    };
-}
+import { SmallTalk, SmallTalkResponse, SentenceResponse } from '../types/smallTalk';
 
 export type Direction = 'current' | 'prev' | 'next';
 

@@ -28,3 +28,19 @@ export interface SmallTalkResponse {
     has_next: boolean;
     has_prev: boolean;
 }
+
+export interface SentenceResponse {
+    data: {
+        talk_id: number;
+        eng_sentence: string;
+        kor_sentence: string | null;
+        parenthesis: string | null;
+        tag: string | null;
+    };
+    navigation: {
+        has_prev: boolean;
+        has_next: boolean;
+        prev_id: number | null;
+        next_id: number;
+    };
+}

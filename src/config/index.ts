@@ -1,13 +1,15 @@
 // 프록시 설정에 따른 API URL 구성
 const getApiUrl = () => {
-    if (import.meta.env.DEV) {
-        // 개발 환경에서는 프록시 사용
-        return '/api/v1';
+    const apiUrl = import.meta.env.VITE_API_URL;
+    if (!apiUrl) {
+        console.warn('VITE_API_URL is not defined in environment variables');
+        return 'http://localhost:8000';
     }
-    // 운영 환경에서는 환경 변수 사용
-    return `${import.meta.env.VITE_API_URL}/api/v1`;
+    return apiUrl;
 };
 
 export const config = {
-    apiUrl: getApiUrl()
+    apiUrl: getApiUrl(),
+    timeout: 30000, // 30 seconds
+    retries: 3,
 };

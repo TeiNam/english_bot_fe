@@ -8,3 +8,13 @@ export interface Prompt {
     create_at: string;
     update_at: string;
 }
+
+export interface PromptResponse {
+    items: Prompt[];
+    total: number;
+    page: number;
+    size: number;
+    total_pages: number;
+    has_next: boolean;
+    has_prev: boolean;
+}

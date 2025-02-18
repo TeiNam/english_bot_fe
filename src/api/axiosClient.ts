@@ -1,22 +1,21 @@
-// axiosClient.ts
 import axios, { InternalAxiosRequestConfig } from 'axios';
 import { useAuthStore } from '../store/authStore';
+import { config } from '../config';
 
 const axiosClient = axios.create({
-    baseURL: '/api/v1',
+    baseURL: `${config.apiUrl}/api/v1`,
+    timeout: config.timeout,
     headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
     },
-    timeout: 10000,
 });
+
+let retryCount = 0;
 
 axiosClient.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
         config.headers = config.headers || {};
-
-        config.headers['Content-Type'] = 'application/json';
-        config.headers['Accept'] = 'application/json';
-        config.headers['X-Requested-With'] = 'XMLHttpRequest';
 
         const token = useAuthStore.getState().token;
         if (token) {
@@ -26,23 +25,37 @@ axiosClient.interceptors.request.use(
         return config;
     },
     (error) => {
+        console.error('Request error:', error);
         return Promise.reject(error);
     }
 );
 
 axiosClient.interceptors.response.use(
-    response => response,
-    error => {
-        const authStore = useAuthStore.getState();
+    response => {
+        retryCount = 0; // Reset retry count on successful response
+        return response;
+    },
+    async error => {
+        const originalRequest = error.config;
 
-        // 401 에러 (인증 실패) 또는 토큰 만료 에러 처리
-        if (error.response?.status === 401 ||
-            error.response?.data?.detail?.includes('expired') ||
-            error.response?.data?.message?.includes('expired')) {
-            // 로그아웃 처리
+        // Connection refused or network error
+        if (error.code === 'ECONNREFUSED' || error.message.includes('Network Error')) {
+            if (retryCount < config.retries) {
+                retryCount++;
+                const backoffDelay = Math.min(1000 * Math.pow(2, retryCount), 10000);
+
+                console.log(`Retrying request (${retryCount}/${config.retries}) after ${backoffDelay}ms`);
+
+                await new Promise(resolve => setTimeout(resolve, backoffDelay));
+                return axiosClient(originalRequest);
+            }
+        }
+
+        // Authentication errors
+        if (error.response?.status === 401) {
+            const authStore = useAuthStore.getState();
             authStore.logout();
 
-            // 현재 URL이 로그인 페이지가 아닌 경우에만 리다이렉트
             if (!window.location.pathname.includes('/login')) {
                 window.location.href = '/login';
             }
@@ -50,14 +63,17 @@ axiosClient.interceptors.response.use(
             return Promise.reject(new Error('인증이 만료되었습니다. 다시 로그인해주세요.'));
         }
 
-        if (error.code === 'ECONNABORTED') {
-            console.error('Request timeout:', error);
-        } else {
-            console.error('API error:', error);
-        }
+        // Log detailed error information
+        console.error('API Error:', {
+            status: error.response?.status,
+            data: error.response?.data,
+            message: error.message,
+            code: error.code,
+            url: originalRequest?.url
+        });
 
         return Promise.reject(error);
     }
 );
 
-export default axiosClient;
+export default axiosClient
