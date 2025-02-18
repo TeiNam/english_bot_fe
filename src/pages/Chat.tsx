@@ -215,14 +215,14 @@ export const Chat = () => {
 
     return (
         // 전체 그리드 컨테이너의 높이를 줄여서 입력 영역이 보이도록 수정 (h-[calc(100vh-8rem)])
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 h-[calc(100vh-8rem)] bg-white">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 h-[calc(100vh-4rem)] md:h-[calc(100vh-8rem)] bg-white safe-area-inset-bottom">
             {/* Sidebar */}
-            <div className="hidden md:flex flex-col bg-white p-4 border-r border-gray-200 overflow-y-auto h-full">
+            <div className="hidden md:flex flex-col bg-white p-3 md:p-4 border-r border-gray-200 overflow-y-auto h-full">
                 <div className="flex space-x-2 mb-4">
                     <ChatSettings />
                     <button
                         onClick={handleNewChat}
-                        className="flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
+                        className="flex items-center justify-center px-3 md:px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
                     >
                         <Plus className="h-4 w-4 mr-2" />
                         새 대화
@@ -267,11 +267,11 @@ export const Chat = () => {
             </div>
 
             {/* Main chat area */}
-            <div className="col-span-1 md:col-span-3 flex flex-col bg-white h-full">
+            <div className="col-span-1 md:col-span-3 flex flex-col bg-white h-full relative">
                 {/* Header */}
-                <div className="flex items-center justify-between p-3 border-b border-gray-200 bg-white">
+                <div className="flex items-center justify-between p-2 md:p-3 border-b border-gray-200 bg-white">
                     <div className="flex items-center space-x-4">
-                        <button onClick={() => navigate('/chat')} className="md:hidden mr-2">
+                        <button onClick={() => navigate('/chat')} className="md:hidden p-2">
                             <ArrowLeft className="h-4 w-4 text-gray-500" />
                         </button>
                         <h1 className="text-base font-semibold text-gray-900">
@@ -286,13 +286,13 @@ export const Chat = () => {
                 </div>
 
                 {/* Message list */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0 bg-gray-50">
+                <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-3 md:space-y-4 min-h-0 bg-gray-50 pb-[200px] md:pb-[220px]">
                     {/* Existing chat history */}
                     {chatHistory?.map((msg: ConversationHistory) => (
                         <div key={msg.chat_history_id} className="space-y-3">
                             <div className="flex flex-col space-y-3">
                                 <div className="flex justify-end">
-                                    <div className="bg-indigo-100 rounded-2xl px-4 py-2 max-w-[85%]">
+                                    <div className="bg-indigo-100 rounded-2xl px-3 md:px-4 py-2 max-w-[90%] md:max-w-[85%]">
                                         <p className="text-gray-900 whitespace-pre-wrap">
                                             {msg.user_message}
                                         </p>
@@ -300,7 +300,7 @@ export const Chat = () => {
                                 </div>
                                 {msg.bot_response && (
                                     <div className="flex justify-start">
-                                        <div className="bg-white rounded-2xl px-4 py-2 max-w-[85%] shadow-sm">
+                                        <div className="bg-white rounded-2xl px-3 md:px-4 py-2 max-w-[90%] md:max-w-[85%] shadow-sm">
                                             <p className="text-gray-900 whitespace-pre-wrap">
                                                 {msg.bot_response}
                                             </p>
@@ -316,7 +316,7 @@ export const Chat = () => {
                         <div key={msg.chat_history_id} className="space-y-3">
                             <div className="flex flex-col space-y-3">
                                 <div className="flex justify-end">
-                                    <div className="bg-indigo-100 rounded-2xl px-4 py-2 max-w-[85%]">
+                                    <div className="bg-indigo-100 rounded-2xl px-3 md:px-4 py-2 max-w-[90%] md:max-w-[85%]">
                                         <p className="text-gray-900 whitespace-pre-wrap">
                                             {msg.user_message}
                                         </p>
@@ -324,7 +324,7 @@ export const Chat = () => {
                                 </div>
                                 {typedMessage && (
                                     <div className="flex justify-start">
-                                        <div className="bg-white rounded-2xl px-4 py-2 max-w-[85%] shadow-sm">
+                                        <div className="bg-white rounded-2xl px-3 md:px-4 py-2 max-w-[90%] md:max-w-[85%] shadow-sm">
                                             <p className="text-gray-900 whitespace-pre-wrap fade-in">
                                                 {typedMessage}
                                             </p>
@@ -359,28 +359,74 @@ export const Chat = () => {
                 )}
 
                 {/* Input area */}
-                <div className="p-2 border-t border-gray-200 bg-white">
+                <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200">
                     {error && <div className="text-red-500 mb-2">{error}</div>}
-                    <div className="flex space-x-4">
+                    <div className="p-2 md:p-3">
+                        <div className="flex space-x-4 mb-3">
             <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value.slice(0, 2000))}
                 onKeyPress={handleKeyPress}
                 placeholder="메시지를 입력하세요..."
-                className="flex-1 min-h-[2.5rem] max-h-24 p-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-indigo-500 text-sm"
+                className="flex-1 min-h-[2.5rem] max-h-24 p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-indigo-500 text-base"
                 disabled={isStreaming}
             />
-                        <button
-                            onClick={handleSendMessage}
-                            disabled={!message.trim() || isStreaming}
-                            className="p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center w-10"
-                        >
-                            {isStreaming ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                                <Send className="h-4 w-4" />
-                            )}
-                        </button>
+                            <button
+                                onClick={handleSendMessage}
+                                disabled={!message.trim() || isStreaming}
+                                className="p-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center w-14"
+                            >
+                                {isStreaming ? (
+                                    <Loader2 className="h-5 w-5 animate-spin" />
+                                ) : (
+                                    <Send className="h-5 w-5" />
+                                )}
+                            </button>
+                        </div>
+
+                        {/* Mobile conversation list */}
+                        <div className="md:hidden border-t border-gray-100 pt-2 max-h-[120px] overflow-y-auto">
+                            <div className="flex items-center space-x-2 px-1 mb-1">
+                                <button
+                                    onClick={handleNewChat}
+                                    className="flex items-center flex-1 px-3 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50 rounded-lg"
+                                >
+                                    <Plus className="h-4 w-4 mr-2" />
+                                    새 대화
+                                </button>
+                                <ChatSettings />
+                            </div>
+                            {conversations?.map((conv: ConversationListResponse) => (
+                                <div
+                                    key={conv.conversation_id}
+                                    className={`px-3 py-2 rounded-lg flex justify-between items-start ${
+                                        conv.conversation_id === conversationId
+                                            ? 'bg-indigo-50'
+                                            : 'hover:bg-gray-50'
+                                    }`}
+                                >
+                                    <div
+                                        className="flex-1 cursor-pointer min-w-0"
+                                        onClick={() => navigate(`/chat/${conv.conversation_id}`)}
+                                    >
+                                        <div className="text-sm font-medium text-gray-900 truncate">
+                                            {conv.title || conv.last_message || '새 대화'}
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (window.confirm('이 대화를 삭제하시겠습니까?')) {
+                                                deleteConversation.mutate(conv.conversation_id);
+                                            }
+                                        }}
+                                        className="p-1 text-gray-400 hover:text-red-500"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
