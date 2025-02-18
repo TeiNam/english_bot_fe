@@ -13,6 +13,7 @@ export const DiaryEditor = ({ initialDiary, onSaved }: Props) => {
     const [body, setBody] = useState('');
     const today = new Date(new Date().getTime() + (9 * 60 * 60 * 1000)).toISOString().split('T')[0];
     const [selectedDate, setSelectedDate] = useState(today);
+    const [isDateEditable, setIsDateEditable] = useState(false);
     const queryClient = useQueryClient();
 
     const feedbackMutation = useMutation({
@@ -43,7 +44,7 @@ export const DiaryEditor = ({ initialDiary, onSaved }: Props) => {
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, data }: { id: number; data: { body: string } }) =>
+        mutationFn: ({ id, data }: { id: number; data: { body: string; date?: string } }) =>
             updateDiary(id, data),
         onSuccess: async (data) => {
             queryClient.invalidateQueries({ queryKey: ['diaries'] });
@@ -64,7 +65,7 @@ export const DiaryEditor = ({ initialDiary, onSaved }: Props) => {
         if (initialDiary) {
             updateMutation.mutate({
                 id: initialDiary.diary_id,
-                data: { body }
+                data: { body, date: selectedDate }
             });
         } else {
             createMutation.mutate({
@@ -101,15 +102,26 @@ export const DiaryEditor = ({ initialDiary, onSaved }: Props) => {
                     <label htmlFor="diary-date" className="block text-sm font-medium text-gray-700">
                         날짜 선택
                     </label>
-                    <input
-                        type="date"
-                        id="diary-date"
-                        value={selectedDate}
-                        onChange={(e) => setSelectedDate(e.target.value)}
-                        max={new Date(new Date().getTime() + (9 * 60 * 60 * 1000)).toISOString().split('T')[0]}
-                        disabled={!!initialDiary}
-                        className="block rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    />
+                    <div className="flex items-center space-x-2">
+                        <input
+                            type="date"
+                            id="diary-date"
+                            value={selectedDate}
+                            onChange={(e) => setSelectedDate(e.target.value)}
+                            max={new Date(new Date().getTime() + (9 * 60 * 60 * 1000)).toISOString().split('T')[0]}
+                            disabled={initialDiary && !isDateEditable}
+                            className="block rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        />
+                        {initialDiary && (
+                            <button
+                                type="button"
+                                onClick={() => setIsDateEditable(!isDateEditable)}
+                                className="text-sm text-indigo-600 hover:text-indigo-500"
+                            >
+                                {isDateEditable ? '취소' : '날짜 수정'}
+                            </button>
+                        )}
+                    </div>
                 </div>
 
                 <textarea
