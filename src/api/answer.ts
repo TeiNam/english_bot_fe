@@ -7,9 +7,7 @@ export const getAnswers = async (talkId: number): Promise<Answer[]> => {
 };
 
 export const getAnswerCount = async (talkId: number): Promise<number> => {
-    const response = await axiosClient.get<{ talk_id: number; answer_count: number }>(
-        `/answers/${talkId}/count`
-    );
+    const response = await axiosClient.get<{ talk_id: number; answer_count: number }>(`/answers/${talkId}/count`);
     return response.data.answer_count;
 };
 

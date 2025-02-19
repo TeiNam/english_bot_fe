@@ -1,10 +1,21 @@
 // 프록시 설정에 따른 API URL 구성
 const getApiUrl = () => {
     const apiUrl = import.meta.env.VITE_API_URL;
+
     if (!apiUrl) {
         console.warn('VITE_API_URL is not defined in environment variables');
-        return 'https://localhost:8000';
+        return import.meta.env.DEV
+            ? 'http://localhost:8000'
+            : window.location.origin;  // 현재 도메인 사용
     }
+
+    // 운영 환경에서는 현재 도메인의 프로토콜 사용
+    if (!import.meta.env.DEV) {
+        const url = new URL(apiUrl);
+        url.protocol = window.location.protocol;
+        return url.toString();
+    }
+
     return apiUrl;
 };
 

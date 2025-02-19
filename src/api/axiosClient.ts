@@ -2,16 +2,8 @@ import axios, { InternalAxiosRequestConfig } from 'axios';
 import { useAuthStore } from '../store/authStore';
 import { config } from '../config/index';
 
-// 운영 환경에서만 HTTPS 강제 적용
-const forceHttps = (url: string) => {
-    if (import.meta.env.DEV) {
-        return url;
-    }
-    return url.replace(/^http:/, 'https:');
-};
-
 const axiosClient = axios.create({
-    baseURL: `${forceHttps(config.apiUrl)}/api/v1`,
+    baseURL: `${config.apiUrl}/api/v1`,
     timeout: config.timeout, // 60 seconds
     headers: {
         'Content-Type': 'application/json',
@@ -24,11 +16,6 @@ const retryState = new Map();
 axiosClient.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
         config.headers = config.headers || {};
-
-        // 운영 환경에서만 URL에 HTTPS 강제 적용
-        if (config.url) {
-            config.url = forceHttps(config.url);
-        }
 
         const token = useAuthStore.getState().token;
         if (token) {
