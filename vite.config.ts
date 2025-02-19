@@ -16,7 +16,7 @@ export default defineConfig({
         outDir: 'dist',
         assetsDir: 'assets',
         cssCodeSplit: true,
-        modulePreload: false,  // preload 비활성화
+        modulePreload: false,
         rollupOptions: {
             output: {
                 assetFileNames: (assetInfo: PreRenderedAsset): string => {
@@ -35,13 +35,7 @@ export default defineConfig({
             }
         },
         target: 'esnext',
-        minify: 'terser',
-        terserOptions: {
-            compress: {
-                drop_console: true,
-                drop_debugger: true
-            }
-        }
+        minify: 'esbuild',  // terser 대신 esbuild 사용
     },
     optimizeDeps: {
         exclude: ['lucide-react'],
