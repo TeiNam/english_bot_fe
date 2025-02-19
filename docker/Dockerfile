@@ -31,4 +31,4 @@ RUN npm install -g serve
 EXPOSE 5173
 
 # Start serve
-CMD ["serve", "-s", "dist", "-l", "5173", "--no-websocket"]
+CMD ["serve", "-s", "dist", "-l", "5173", "--no-hrm"]
