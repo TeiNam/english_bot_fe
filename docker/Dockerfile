@@ -13,7 +13,7 @@ WORKDIR /app
 
 # Install dependencies
 COPY package*.json ./
-RUN npm install
+RUN npm ci --legacy-peer-deps
 
 # Copy source code and serve config
 COPY . .
@@ -30,5 +30,5 @@ RUN npm install -g serve
 # Expose port 5173
 EXPOSE 5173
 
-# Start serve
-CMD ["serve", "-s", "dist", "-l", "5173", "--no-hrm"]
+# Start serve with updated options
+CMD ["serve", "-s", "dist", "-l", "5173", "--no-websocket"]
