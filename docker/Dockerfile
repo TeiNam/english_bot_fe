@@ -1,5 +1,5 @@
 # Build and serve stage
-FROM node:22.6.0-slim
+FROM node:20.18.3-slim
 
 # Set timezone and install required packages
 ENV TZ=Asia/Seoul
@@ -31,4 +31,4 @@ RUN npm install -g serve
 EXPOSE 5173
 
 # Start serve
-CMD ["serve", "-s", "dist", "-l", "5173"]
+CMD ["serve", "-s", "dist", "-l", "5173", "--no-websocket"]
