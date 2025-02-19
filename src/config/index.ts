@@ -12,6 +12,6 @@ export const config = {
     apiUrl: getApiUrl(),
     timeout: 60000, // 60 seconds
     retries: 5,
-    maxBackoffDelay: 30000, // 30 seconds maximum backoff delay
-    initialBackoffDelay: 1000, // 1 second initial backoff delay
+    maxBackoffDelay: 30000, // 30초 최대 백오프 딜레이
+    initialBackoffDelay: 1000, // 1초 초기 백오프 딜레이
 };

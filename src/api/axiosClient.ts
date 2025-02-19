@@ -1,6 +1,6 @@
 import axios, { InternalAxiosRequestConfig } from 'axios';
 import { useAuthStore } from '../store/authStore';
-import { config } from '../config';
+import { config } from '../config/index';
 
 const axiosClient = axios.create({
     baseURL: `${config.apiUrl}/api/v1`,
@@ -61,7 +61,7 @@ axiosClient.interceptors.response.use(
                     config.maxBackoffDelay
                 );
 
-                console.log(`Retrying request (${retryCount}/${config.retries}) after ${backoffDelay}ms`);
+                console.log(`재시도 중 (${retryCount}/${config.retries}) - ${backoffDelay}ms 후`);
 
                 await new Promise(resolve => setTimeout(resolve, backoffDelay));
                 return axiosClient(originalRequest);
