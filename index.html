@@ -1,39 +1,44 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>English Sentence Study</title>
-  <!-- 스타일시트 프리로드 -->
-  <link rel="preload" href="/src/index.css" as="style">
-  <!-- 초기 로딩 스타일 -->
-  <style>
-    #root {
-      opacity: 0;
-      transition: opacity 0.2s ease-in-out;
-    }
-    #root.loaded {
-      opacity: 1;
-    }
-    /* 초기 로딩 스피너 스타일 */
-    .initial-loader {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 2rem;
-      height: 2rem;
-      border: 2px solid #f3f3f3;
-      border-top: 2px solid #3498db;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      0% { transform: translate(-50%, -50%) rotate(0deg); }
-      100% { transform: translate(-50%, -50%) rotate(360deg); }
-    }
-  </style>
+    <meta charset="UTF-8"/>
+    <link rel="icon" type="image/svg+xml" href="/vite.svg"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>English Sentence Study</title>
+    <!-- 초기 로딩 스타일 -->
+    <style>
+        #root {
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+        }
+
+        #root.loaded {
+            opacity: 1;
+        }
+
+        /* 초기 로딩 스피너 스타일 */
+        .initial-loader {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 2rem;
+            height: 2rem;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+            100% {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+    </style>
 </head>
 <body>
 <!-- 초기 로딩 스피너 -->
@@ -41,17 +46,17 @@
 <div id="root"></div>
 <script type="module" src="/src/main.tsx"></script>
 <script>
-  // 페이지 로드 완료 시 root의 opacity를 1로 변경
-  window.addEventListener('load', () => {
-    const loader = document.querySelector('.initial-loader');
-    const root = document.getElementById('root');
-    if (loader) {
-      loader.style.display = 'none';
-    }
-    if (root) {
-      root.classList.add('loaded');
-    }
-  });
+    // 페이지 로드 완료 시 root의 opacity를 1로 변경
+    window.addEventListener('load', () => {
+        const loader = document.querySelector('.initial-loader');
+        const root = document.getElementById('root');
+        if (loader) {
+            loader.style.display = 'none';
+        }
+        if (root) {
+            root.classList.add('loaded');
+        }
+    });
 </script>
 </body>
 </html>

@@ -14,17 +14,21 @@ export const useAuthStore = create<AuthState>()(
             token: null,
             user: null,
             setAuth: (token, user) => {
-                console.log('Setting auth state:', { token, user }); // 디버깅용 로그
-                set({ token, user });
+                // 토큰을 메모리에만 저장
+                set({ token, user: { ...user, token: undefined } });
             },
             logout: () => {
-                console.log('Logging out'); // 디버깅용 로그
                 set({ token: null, user: null });
+                sessionStorage.clear();
             },
         }),
         {
             name: 'auth-storage',
-            skipHydration: false,
+            partialize: (state) => ({
+                // 토큰을 제외한 사용자 정보만 저장
+                user: state.user,
+                token: null
+            })
         }
     )
 );

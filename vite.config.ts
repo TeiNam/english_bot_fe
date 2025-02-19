@@ -16,7 +16,7 @@ export default defineConfig({
         outDir: 'dist',
         assetsDir: 'assets',
         cssCodeSplit: true,
-        modulePreload: false,
+        modulePreload: false,  // preload 비활성화
         rollupOptions: {
             output: {
                 assetFileNames: (assetInfo: PreRenderedAsset): string => {

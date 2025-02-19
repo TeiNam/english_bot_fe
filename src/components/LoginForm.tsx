@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogIn } from 'lucide-react';
 import { login } from '../api/auth';
-import { useAuthStore } from '../store/authStore';
 
 export const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -10,7 +9,6 @@ export const LoginForm = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const setAuth = useAuthStore((state) => state.setAuth);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,9 +16,7 @@ export const LoginForm = () => {
     setError('');
 
     try {
-      const response = await login({ email, password });
-      console.log('Login successful:', response); // 디버깅용 로그
-      setAuth(response.access_token, response.user);
+      await login({ email, password });
 
       // 약간의 지연 후 네비게이션 실행
       setTimeout(() => {
