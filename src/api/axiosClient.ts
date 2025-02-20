@@ -2,6 +2,33 @@ import axios, {InternalAxiosRequestConfig} from 'axios';
 import {config} from '../config';
 import {ApiError} from '../types/api';
 
+const getApiUrl = () => {
+    const apiUrl = import.meta.env.VITE_API_URL;
+    if (!apiUrl) {
+        console.warn('VITE_API_URL is not defined in environment variables');
+        return import.meta.env.DEV
+            ? 'http://localhost:8000'
+            : window.location.origin;
+    }
+
+    try {
+        const url = new URL(apiUrl);
+
+        // 현재 페이지가 HTTPS면 API URL도 HTTPS 사용
+        if (window.location.protocol === 'https:') {
+            url.protocol = 'https:';
+        }
+
+        return url.toString().replace(/\/$/, '');
+    } catch (error) {
+        console.error('Invalid API URL:', error);
+        // 현재 페이지가 HTTPS면 API URL도 HTTPS 사용
+        return window.location.protocol === 'https:'
+            ? apiUrl.replace('http:', 'https:')
+            : apiUrl;
+    }
+};
+
 // Get token function to avoid circular dependency
 const getAuthToken = () => {
     try {
@@ -17,12 +44,13 @@ const getAuthToken = () => {
 };
 
 const axiosClient = axios.create({
-    baseURL: `${config.apiUrl}/api/v1`,
+    baseURL: `${getApiUrl()}/api/v1`,
     timeout: config.timeout, // 60 seconds
+    maxRedirects: 5, // 리다이렉트 허용
     headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
-    },
+    }
 });
 
 // 재시도 상태를 추적하기 위한 Map
@@ -64,10 +92,26 @@ const errorHandler = (error: any): Promise<ApiError> => {
     if (requestUrl) {
         let retryCount = retryState.get(requestUrl) || 0;
 
-        if (error.code === 'ECONNREFUSED' || error.message.includes('Network Error')) {
+        // 네트워크 에러나 리다이렉트 관련 에러 처리
+        if (error.code === 'ECONNREFUSED' ||
+            error.message.includes('Network Error') ||
+            error.response?.status === 301 ||
+            error.response?.status === 302) {
+
             if (retryCount < config.retries) {
                 retryCount++;
                 retryState.set(requestUrl, retryCount);
+
+                // 리다이렉트 처리
+                if (error.response?.headers?.location) {
+                    const location = error.response.headers.location;
+                    if (window.location.protocol === 'https:' && location.startsWith('http:')) {
+                        originalRequest.url = location.replace('http:', 'https:');
+                    } else {
+                        originalRequest.url = location;
+                    }
+                    originalRequest.method = 'GET';  // 리다이렉트는 GET으로 변경
+                }
 
                 const backoffDelay = Math.min(
                     config.initialBackoffDelay * Math.pow(2, retryCount - 1) * (1 + Math.random() * 0.1),
@@ -146,8 +190,13 @@ const errorHandler = (error: any): Promise<ApiError> => {
     // 네트워크 오류 처리
     else if (error.request) {
         errorResponse.message = '서버에 연결할 수 없습니다.';
-        errorResponse.code = 'NETWORK_ERROR';
+        errorResponse.code = error.code || 'NETWORK_ERROR';
         errorResponse.status = 0;
+
+        // 리다이렉트 관련 추가 정보 로깅
+        if (error.request.responseURL) {
+            console.warn('Last attempted URL:', error.request.responseURL);
+        }
     }
 
     // 자세한 에러 로깅
@@ -177,6 +226,6 @@ axiosClient.interceptors.response.use(
 );
 
 // API URL 가져오기 메서드 추가
-axiosClient.getUri = () => config.apiUrl;
+axiosClient.getUri = () => `${getApiUrl()}/api/v1`;
 
 export default axiosClient;

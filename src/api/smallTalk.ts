@@ -12,13 +12,19 @@ export const getSmallTalks = async (page: number = 1, size: number = 10): Promis
 export const getSmallTalk = async (talkId: number): Promise<SmallTalk> => {
     console.log('Fetching small talk for ID:', talkId);
     try {
-        const response = await axiosClient.get<ApiResponse<SmallTalk>>(`/small-talk/${talkId}`);
-        console.log('SmallTalk API response:', response.data);
+        // 스몰톡 데이터와 답변 목록을 병렬로 가져오기
+        const [talkResponse, answersResponse] = await Promise.all([
+            axiosClient.get<ApiResponse<SmallTalk>>(`/small-talk/${talkId}`),
+            axiosClient.get<Answer[]>(`/answers/${talkId}`)
+        ]);
 
-        // response 자체가 데이터이므로 data 래핑이 필요 없음
+        console.log('SmallTalk API response:', talkResponse.data);
+        console.log('Answers API response:', answersResponse.data);
+
+        // 스몰톡 데이터와 답변 목록을 합치기
         return {
-            ...response.data,  // API 응답 자체가 데이터
-            answers: []  // 초기에 빈 배열로 설정
+            ...talkResponse.data,
+            answers: answersResponse.data || []
         };
     } catch (error) {
         console.error('Error fetching small talk:', error);

@@ -21,22 +21,13 @@ export const SmallTalkList = ({ onSelectTalk, selectedTalkId, pageSize = 10 }: P
     });
 
     // 답변 개수를 가져오는 쿼리 최적화
-    const answerCounts = useQuery({
-        queryKey: ['answerCounts', data?.items?.map(talk => talk.talk_id)],
+    const { data: answerCountsData } = useQuery({
+        queryKey: ['answerCounts', data?.items?.map(talk => talk.talk_id).join(',')],
         queryFn: async () => {
             if (!data?.items?.length) return {};
-
-            const results = await Promise.allSettled(
-                data.items.map(talk => getAnswerCount(talk.talk_id))
-            );
-
-            return data.items.reduce((acc, talk, index) => {
-                const result = results[index];
-                acc[talk.talk_id] = result.status === 'fulfilled' ? result.value : 0;
-                return acc;
-            }, {} as Record<number, number>);
+            return getAnswerCounts(data.items.map(talk => talk.talk_id));
         },
-        enabled: !!data?.items,
+        enabled: !!data?.items?.length,
         staleTime: 1000 * 60 * 5,
         retry: 1,
         refetchOnWindowFocus: false
@@ -128,7 +119,7 @@ export const SmallTalkList = ({ onSelectTalk, selectedTalkId, pageSize = 10 }: P
                         <div className="flex items-center space-x-4 text-sm text-gray-500">
               <span className="flex items-center">
                 <MessageSquare className="h-4 w-4 mr-1" />
-                  {answerCounts.data?.[talk.talk_id] ?? 0} 답변
+                  {answerCountsData?.[talk.talk_id] ?? 0} 답변
               </span>
                             <span className="flex items-center">
                 <Calendar className="h-4 w-4 mr-1" />

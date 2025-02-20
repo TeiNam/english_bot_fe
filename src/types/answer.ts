@@ -7,8 +7,12 @@ export interface Answer {
     update_at: string;
 }
 
-export interface AnswerCount {
+export interface AnswerCountResponse {
     talk_id: number;
     answer_count: number;
 }
 
+export type AnswerCount = {
+    talk_id: number;
+    answer_count: number;
+};
