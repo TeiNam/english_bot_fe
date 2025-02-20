@@ -1,13 +1,13 @@
 import React from 'react';
-import { ConversationHistory } from '../types/chat';
-import { useInView } from 'react-intersection-observer';
+import {ConversationHistory} from '../types/chat';
+import {useInView} from 'react-intersection-observer';
 
 interface MessageItemProps {
     message: ConversationHistory;
     isLast?: boolean;
 }
 
-const MessageItem = React.memo(({ message, isLast }: MessageItemProps) => (
+const MessageItem = React.memo(({message, isLast}: MessageItemProps) => (
     <div className="space-y-3">
         <div className="flex flex-col space-y-3">
             <div className="flex justify-end">
@@ -36,8 +36,8 @@ interface ChatMessagesProps {
     onLoadMore?: () => void;
 }
 
-export const ChatMessages = React.memo(({ messages, isLoading, onLoadMore }: ChatMessagesProps) => {
-    const { ref, inView } = useInView({
+export const ChatMessages = React.memo(({messages, isLoading, onLoadMore}: ChatMessagesProps) => {
+    const {ref, inView} = useInView({
         threshold: 0.5,
         triggerOnce: false
     });
@@ -60,7 +60,7 @@ export const ChatMessages = React.memo(({ messages, isLoading, onLoadMore }: Cha
             ))}
             {isLoading && (
                 <div className="flex justify-center py-4">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500" />
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"/>
                 </div>
             )}
         </div>

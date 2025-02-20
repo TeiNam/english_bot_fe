@@ -1,10 +1,10 @@
 import axiosClient from './axiosClient';
-import { Vocabulary, VocabularyResponse } from '../types/vocabulary';
+import {Vocabulary, VocabularyResponse} from '../types/vocabulary';
 
 export const getVocabularies = async (page: number = 1, size: number = 10): Promise<VocabularyResponse> => {
     try {
         const response = await axiosClient.get<VocabularyResponse>('/vocabulary/', {
-            params: { page, size }
+            params: {page, size}
         });
         return response.data;
     } catch (error) {
@@ -15,28 +15,28 @@ export const getVocabularies = async (page: number = 1, size: number = 10): Prom
 
 export const getVocabulary = async (vocabularyId: number): Promise<Vocabulary> => {
     const response = await axiosClient.get<Vocabulary>(`/vocabulary/${vocabularyId}`, {
-        headers: { 'Accept': 'application/json' }
+        headers: {'Accept': 'application/json'}
     });
     return response.data;
 };
 
 export const createVocabulary = async (data: any): Promise<Vocabulary> => {
     const response = await axiosClient.post<Vocabulary>('/vocabulary/', data, {
-        headers: { 'Accept': 'application/json' }
+        headers: {'Accept': 'application/json'}
     });
     return response.data;
 };
 
 export const updateVocabulary = async (vocabularyId: number, data: any): Promise<Vocabulary> => {
     const response = await axiosClient.put<Vocabulary>(`/vocabulary/${vocabularyId}`, data, {
-        headers: { 'Accept': 'application/json' }
+        headers: {'Accept': 'application/json'}
     });
     return response.data;
 };
 
 export const deleteVocabulary = async (vocabularyId: number): Promise<void> => {
     await axiosClient.delete(`/vocabulary/${vocabularyId}`, {
-        headers: { 'Accept': 'application/json' }
+        headers: {'Accept': 'application/json'}
     });
 };
 
@@ -48,7 +48,7 @@ export const searchVocabularies = async (query: string, page: number = 1, size: 
 
     try {
         const response = await axiosClient.get<VocabularyResponse>('/vocabulary/text-search', {
-            params: { q: query, page, size }
+            params: {q: query, page, size}
         });
         return response.data;
     } catch (error) {
@@ -64,7 +64,7 @@ export const getVocabularyMeaningCountsByIds = async (
 
     try {
         const response = await axiosClient.get<Record<number, number>>('/vocabulary/meanings/counts', {
-            params: { vocabulary_ids: vocabularyIds },
+            params: {vocabulary_ids: vocabularyIds},
             paramsSerializer: params => {
                 // vocabulary_ids[]={id} 형식으로 직렬화
                 return Object.entries(params)

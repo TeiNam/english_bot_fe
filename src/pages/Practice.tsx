@@ -1,19 +1,16 @@
-import { useQuery } from '@tanstack/react-query';
-import { getSentence, SentenceResponse } from '../api/smallTalk';
-import { ArrowLeft, ArrowRight, Info, Tag as TagIcon } from 'lucide-react';
-import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
-import { useAuthStore } from '../store/authStore';
+import {useQuery} from '@tanstack/react-query';
+import {getSentence} from '../api/smallTalk';
+import {SentenceResponse} from '../types/smallTalk';
+import {ArrowLeft, ArrowRight, Info, Tag as TagIcon} from 'lucide-react';
+import {useState} from 'react';
+import {Navigate} from 'react-router-dom';
+import {useAuthStore} from '../store/authStore';
 
 export const Practice = () => {
     const [currentTalkId, setCurrentTalkId] = useState<number | null>(null);
     const token = useAuthStore((state) => state.token);
 
-    if (!token) {
-        return <Navigate to="/login" replace />;
-    }
-
-    const { data: sentence, isLoading, error } = useQuery<SentenceResponse>({
+    const {data: sentence, isLoading, error} = useQuery<SentenceResponse>({
         queryKey: ['sentence', currentTalkId],
         queryFn: () => getSentence(
             'current',
@@ -21,15 +18,19 @@ export const Practice = () => {
         )
     });
 
+    if (!token) {
+        return <Navigate to="/login" replace/>;
+    }
+
     const handlePrevious = async () => {
-        if (sentence?.data.talk_id) {
+        if (sentence?.data?.talk_id) {
             const prevSentence = await getSentence('prev', sentence.data.talk_id);
             setCurrentTalkId(prevSentence.data.talk_id);
         }
     };
 
     const handleNext = async () => {
-        if (sentence?.data.talk_id) {
+        if (sentence?.data?.talk_id) {
             const nextSentence = await getSentence('next', sentence.data.talk_id);
             setCurrentTalkId(nextSentence.data.talk_id);
         }
@@ -51,7 +52,7 @@ export const Practice = () => {
         );
     }
 
-    if (!sentence) {
+    if (!sentence || !sentence.data) {
         return (
             <div className="text-center text-gray-500 p-4">
                 등록된 문장이 없습니다
@@ -79,7 +80,7 @@ export const Practice = () => {
                     {sentence.data.parenthesis && (
                         <div className="flex items-start space-x-3 text-gray-600 bg-gray-50 p-4 sm:p-5 rounded-lg">
                             <div className="flex-shrink-0 bg-white rounded-full p-1 shadow-sm">
-                                <Info className="h-5 w-5 text-gray-400" />
+                                <Info className="h-5 w-5 text-gray-400"/>
                             </div>
                             <pre className="whitespace-pre-wrap font-sans text-sm break-words flex-grow">
                                 {sentence.data.parenthesis}
@@ -89,7 +90,7 @@ export const Practice = () => {
 
                     {sentence.data.tag && (
                         <div className="flex items-center space-x-2 text-gray-500">
-                            <TagIcon className="h-4 w-4" />
+                            <TagIcon className="h-4 w-4"/>
                             <span className="text-sm">{sentence.data.tag}</span>
                         </div>
                     )}
@@ -100,7 +101,7 @@ export const Practice = () => {
                             disabled={!sentence.navigation.has_prev}
                             className="flex items-center px-3 sm:px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            <ArrowLeft className="h-4 w-4 mr-2" />
+                            <ArrowLeft className="h-4 w-4 mr-2"/>
                             이전 문장
                         </button>
                         <button
@@ -109,7 +110,7 @@ export const Practice = () => {
                             className="flex items-center px-3 sm:px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             다음 문장
-                            <ArrowRight className="h-4 w-4 ml-2" />
+                            <ArrowRight className="h-4 w-4 ml-2"/>
                         </button>
                     </div>
                 </div>

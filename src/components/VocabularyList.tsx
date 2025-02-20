@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { getVocabularies, getVocabularyMeaningCountsByIds, searchVocabularies } from '../api/vocabulary';
-import { Book, Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Edit2, Trash2 } from 'lucide-react';
-import { useSearchParams } from 'react-router-dom';
-import { Vocabulary, VocabularyResponse, MeaningCounts } from '../types/vocabulary';
+import {useCallback, useEffect} from 'react';
+import {keepPreviousData, useQuery} from '@tanstack/react-query';
+import {getVocabularies, getVocabularyMeaningCountsByIds, searchVocabularies} from '../api/vocabulary';
+import {Book, Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Edit2, Trash2} from 'lucide-react';
+import {useSearchParams} from 'react-router-dom';
+import {MeaningCounts, Vocabulary} from '../types/vocabulary';
 
 // 타입 정의
 interface Vocabulary {
@@ -45,7 +45,7 @@ export default function VocabularyList({
 
     // 검색어가 변경될 때 페이지를 1로 리셋
     useEffect(() => {
-        setSearchParams({ page: '1' });
+        setSearchParams({page: '1'});
     }, [searchQuery, setSearchParams]);
 
     const {
@@ -76,7 +76,7 @@ export default function VocabularyList({
     });
 
     const handlePageChange = useCallback((page: number) => {
-        setSearchParams({ page: page.toString() });
+        setSearchParams({page: page.toString()});
     }, [setSearchParams]);
 
     const formatDate = useCallback((dateString: string | null) => {
@@ -164,11 +164,11 @@ export default function VocabularyList({
                                 </h3>
                                 <div className="flex items-center space-x-4 text-sm text-gray-500">
                                     <span className="flex items-center">
-                                        <Book className="h-4 w-4 mr-1" />
+                                        <Book className="h-4 w-4 mr-1"/>
                                         {meaningCounts?.[vocabulary.vocabulary_id] ?? 0} 의미
                                     </span>
                                     <span className="flex items-center">
-                                        <Calendar className="h-4 w-4 mr-1" />
+                                        <Calendar className="h-4 w-4 mr-1"/>
                                         {formatDate(vocabulary.create_at)}
                                     </span>
                                 </div>
@@ -182,7 +182,7 @@ export default function VocabularyList({
                                     className="p-1 text-gray-400 hover:text-gray-500"
                                     aria-label="단어 수정"
                                 >
-                                    <Edit2 className="h-4 w-4" />
+                                    <Edit2 className="h-4 w-4"/>
                                 </button>
                                 <button
                                     onClick={async (e) => {
@@ -192,7 +192,7 @@ export default function VocabularyList({
                                     className="p-1 text-gray-400 hover:text-red-500"
                                     aria-label="단어 삭제"
                                 >
-                                    <Trash2 className="h-4 w-4" />
+                                    <Trash2 className="h-4 w-4"/>
                                 </button>
                             </div>
                         </div>
@@ -208,7 +208,7 @@ export default function VocabularyList({
                         className="p-2 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="첫 페이지"
                     >
-                        <ChevronsLeft className="h-4 w-4" />
+                        <ChevronsLeft className="h-4 w-4"/>
                     </button>
                     <button
                         onClick={() => handlePageChange(currentPage - 1)}
@@ -216,7 +216,7 @@ export default function VocabularyList({
                         className="p-2 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="이전 페이지"
                     >
-                        <ChevronLeft className="h-4 w-4" />
+                        <ChevronLeft className="h-4 w-4"/>
                     </button>
 
                     {getPageNumbers().map(pageNum => (
@@ -239,7 +239,7 @@ export default function VocabularyList({
                         className="p-2 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="다음 페이지"
                     >
-                        <ChevronRight className="h-4 w-4" />
+                        <ChevronRight className="h-4 w-4"/>
                     </button>
                     <button
                         onClick={() => handlePageChange(data.total_pages)}
@@ -247,7 +247,7 @@ export default function VocabularyList({
                         className="p-2 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="마지막 페이지"
                     >
-                        <ChevronsRight className="h-4 w-4" />
+                        <ChevronsRight className="h-4 w-4"/>
                     </button>
                 </div>
             )}

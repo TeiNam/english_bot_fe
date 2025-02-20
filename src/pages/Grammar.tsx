@@ -1,12 +1,22 @@
-import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getGrammars, deleteGrammar } from '../api/grammar';
-import { GrammarDetail } from '../components/GrammarDetail';
-import { ManageGrammarForm } from '../components/ManageGrammarForm';
-import { Plus, Edit2, Trash2, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
-import { useAuthStore } from '../store/authStore';
-import { Grammar as GrammarType } from '../types/grammar';
+import {useState} from 'react';
+import {Navigate} from 'react-router-dom';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {deleteGrammar, getGrammars} from '../api/grammar';
+import {GrammarDetail} from '../components/GrammarDetail';
+import {ManageGrammarForm} from '../components/ManageGrammarForm';
+import {
+    ChevronDown,
+    ChevronLeft,
+    ChevronRight,
+    ChevronsLeft,
+    ChevronsRight,
+    ChevronUp,
+    Edit2,
+    Plus,
+    Trash2
+} from 'lucide-react';
+import {useAuthStore} from '../store/authStore';
+import {Grammar as GrammarType} from '../types/grammar';
 
 export const Grammar = () => {
     const [selectedGrammarId, setSelectedGrammarId] = useState<number | null>(null);
@@ -17,7 +27,7 @@ export const Grammar = () => {
     const queryClient = useQueryClient();
     const token = useAuthStore((state) => state.token);
 
-    const { data, isLoading } = useQuery({
+    const {data, isLoading} = useQuery({
         queryKey: ['grammars', currentPage, pageSize],
         queryFn: () => getGrammars(currentPage, pageSize)
     });
@@ -25,7 +35,7 @@ export const Grammar = () => {
     const deleteMutation = useMutation({
         mutationFn: deleteGrammar,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['grammars'] });
+            queryClient.invalidateQueries({queryKey: ['grammars']});
             setSelectedGrammarId(null);
         }
     });
@@ -79,7 +89,7 @@ export const Grammar = () => {
     };
 
     if (!token) {
-        return <Navigate to="/login" replace />;
+        return <Navigate to="/login" replace/>;
     }
 
     if (isLoading) {
@@ -101,7 +111,7 @@ export const Grammar = () => {
                     }}
                     className="flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
-                    <Plus className="h-4 w-4 mr-2" />
+                    <Plus className="h-4 w-4 mr-2"/>
                     새 문법
                 </button>
             </div>
@@ -116,9 +126,9 @@ export const Grammar = () => {
                             >
                                 <div className="px-6 py-4 flex items-center">
                                     {selectedGrammarId === grammar.grammar_id ? (
-                                        <ChevronUp className="h-5 w-5 text-gray-400 mr-2" />
+                                        <ChevronUp className="h-5 w-5 text-gray-400 mr-2"/>
                                     ) : (
-                                        <ChevronDown className="h-5 w-5 text-gray-400 mr-2" />
+                                        <ChevronDown className="h-5 w-5 text-gray-400 mr-2"/>
                                     )}
                                     <div className="flex-1 flex items-center justify-between">
                                         <div className="text-lg font-medium text-gray-900">
@@ -136,7 +146,7 @@ export const Grammar = () => {
                                                     }}
                                                     className="text-gray-400 hover:text-gray-600"
                                                 >
-                                                    <Edit2 className="h-4 w-4" />
+                                                    <Edit2 className="h-4 w-4"/>
                                                 </button>
                                                 <button
                                                     onClick={(e) => {
@@ -145,7 +155,7 @@ export const Grammar = () => {
                                                     }}
                                                     className="text-gray-400 hover:text-red-500"
                                                 >
-                                                    <Trash2 className="h-4 w-4" />
+                                                    <Trash2 className="h-4 w-4"/>
                                                 </button>
                                             </div>
                                         </div>
@@ -173,7 +183,7 @@ export const Grammar = () => {
                         className="p-2 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="첫 페이지"
                     >
-                        <ChevronsLeft className="h-4 w-4" />
+                        <ChevronsLeft className="h-4 w-4"/>
                     </button>
                     <button
                         onClick={() => setCurrentPage(currentPage - 1)}
@@ -181,7 +191,7 @@ export const Grammar = () => {
                         className="p-2 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="이전 페이지"
                     >
-                        <ChevronLeft className="h-4 w-4" />
+                        <ChevronLeft className="h-4 w-4"/>
                     </button>
 
                     {getPageNumbers().map((pageNum, index) => (
@@ -208,7 +218,7 @@ export const Grammar = () => {
                         className="p-2 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="다음 페이지"
                     >
-                        <ChevronRight className="h-4 w-4" />
+                        <ChevronRight className="h-4 w-4"/>
                     </button>
                     <button
                         onClick={() => setCurrentPage(data.total_pages)}
@@ -216,7 +226,7 @@ export const Grammar = () => {
                         className="p-2 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="마지막 페이지"
                     >
-                        <ChevronsRight className="h-4 w-4" />
+                        <ChevronsRight className="h-4 w-4"/>
                     </button>
                 </div>
             )}

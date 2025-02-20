@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import {create} from 'zustand';
+import {createJSONStorage, persist} from 'zustand/middleware';
 
 interface AuthState {
     token: string | null;
@@ -13,24 +13,24 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             token: null,
             user: null,
             tokenExpiry: null,
             setAuth: (token, user, tokenExpiry) => {
-                set({ token, user, tokenExpiry });
+                set({token, user, tokenExpiry});
             },
             logout: () => {
-                set({ token: null, user: null, tokenExpiry: null });
+                set({token: null, user: null, tokenExpiry: null});
                 sessionStorage.clear();
                 window.location.href = '/login';
             },
             isAuthenticated: () => {
-                const state = get();
+                const state = get();  // 이제 get() 사용 가능
                 return !!(state.token && state.tokenExpiry && Date.now() < state.tokenExpiry);
             },
             getToken: () => {
-                const state = get();
+                const state = get();  // 이제 get() 사용 가능
                 if (state.token && state.tokenExpiry && Date.now() < state.tokenExpiry) {
                     return state.token;
                 }

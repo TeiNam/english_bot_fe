@@ -1,20 +1,20 @@
-import { useQuery } from '@tanstack/react-query';
-import { getSmallTalk } from '../api/smallTalk';
-import { getAnswers } from '../api/answer';
-import { MessageCircle, Info, Tag as TagIcon } from 'lucide-react';
+import {useQuery} from '@tanstack/react-query';
+import {getSmallTalk} from '../api/smallTalk';
+import {getAnswers} from '../api/answer';
+import {Info, MessageCircle, Tag as TagIcon} from 'lucide-react';
 
 interface Props {
     talkId: number;
     onClose: () => void;
 }
 
-export const SmallTalkDetail = ({ talkId, onClose }: Props) => {
-    const { data: talk, isLoading: isTalkLoading } = useQuery({
+export const SmallTalkDetail = ({talkId, onClose}: Props) => {
+    const {data: talk, isLoading: isTalkLoading} = useQuery({
         queryKey: ['smallTalk', talkId],
         queryFn: () => getSmallTalk(talkId)
     });
 
-    const { data: answers, isLoading: isAnswersLoading } = useQuery({
+    const {data: answers, isLoading: isAnswersLoading} = useQuery({
         queryKey: ['answers', talkId],
         queryFn: () => getAnswers(talkId),
         enabled: !!talkId
@@ -28,7 +28,7 @@ export const SmallTalkDetail = ({ talkId, onClose }: Props) => {
         );
     }
 
-    if (!talk) {
+    if (!talk || !talk.eng_sentence) {
         return (
             <div className="text-center text-red-600 p-4">
                 스몰톡을 불러오는데 실패했습니다
@@ -46,7 +46,7 @@ export const SmallTalkDetail = ({ talkId, onClose }: Props) => {
                 >
                     <span className="sr-only">닫기</span>
                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>
             </div>
@@ -61,15 +61,16 @@ export const SmallTalkDetail = ({ talkId, onClose }: Props) => {
                 {talk.parenthesis && (
                     <div className="flex items-start space-x-3 text-gray-600 bg-gray-50 p-4 rounded-lg">
                         <div className="flex-shrink-0 bg-white rounded-full p-1 shadow-sm">
-                            <Info className="h-5 w-5 text-gray-400" />
+                            <Info className="h-5 w-5 text-gray-400"/>
                         </div>
-                        <pre className="whitespace-pre-wrap font-sans text-sm break-words flex-grow">{talk.parenthesis}</pre>
+                        <pre
+                            className="whitespace-pre-wrap font-sans text-sm break-words flex-grow">{talk.parenthesis}</pre>
                     </div>
                 )}
 
                 {talk.tag && (
                     <div className="flex items-center space-x-2">
-                        <TagIcon className="h-4 w-4 text-gray-400" />
+                        <TagIcon className="h-4 w-4 text-gray-400"/>
                         <span className="text-sm text-gray-600">{talk.tag}</span>
                     </div>
                 )}
@@ -77,7 +78,7 @@ export const SmallTalkDetail = ({ talkId, onClose }: Props) => {
                 {answers && answers.length > 0 && (
                     <div className="mt-8">
                         <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
-                            <MessageCircle className="h-5 w-5 mr-2" />
+                            <MessageCircle className="h-5 w-5 mr-2"/>
                             답변 목록
                         </h3>
                         <div className="space-y-4">

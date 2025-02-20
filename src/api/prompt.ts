@@ -1,5 +1,5 @@
 import axiosClient from './axiosClient';
-import { Prompt } from '../types/prompt';
+import {Prompt} from '../types/prompt';
 
 export const getPrompts = async (): Promise<Prompt[]> => {
     const response = await axiosClient.get<Prompt[]>('/chat/prompts/templates');

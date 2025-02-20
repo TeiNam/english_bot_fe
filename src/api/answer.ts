@@ -1,7 +1,6 @@
 // src/api/answer.ts
 import axiosClient from './axiosClient';
-import {ApiResponse} from '../types/api';
-import {Answer, AnswerCount} from '../types/answer';
+import {Answer} from '../types/answer';
 
 export const getAnswers = async (talkId: number): Promise<Answer[]> => {
     try {
@@ -22,15 +21,17 @@ export const getAnswerCounts = async (talkIds: number[]): Promise<Record<number,
     if (!talkIds.length) return {};
 
     try {
-        const response = await axiosClient.get<AnswerCount[]>(`/answers/counts/${talkIds.join(',')}`);
+        const response = await axiosClient.get<Array<{
+            talk_id: number;
+            answer_count: number;
+        }>>(`/answers/counts?talk_ids=${talkIds.join(',')}`);
 
-        // 응답을 Record 형태로 변환
         return response.data.reduce((acc, item) => {
             acc[item.talk_id] = item.answer_count;
             return acc;
         }, {} as Record<number, number>);
     } catch (error) {
-        console.warn('Failed to get answer counts:', error);
+        console.error('Failed to get answer counts:', error);
         return {};
     }
 };

@@ -1,14 +1,14 @@
 import React from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createPrompt, updatePrompt } from '../api/prompt';
-import { Prompt } from '../types/prompt';
+import {useMutation, useQueryClient} from '@tanstack/react-query';
+import {createPrompt, updatePrompt} from '../api/prompt';
+import {Prompt} from '../types/prompt';
 
 interface Props {
     initialData?: Prompt;
     onClose: () => void;
 }
 
-export const ManagePromptForm = ({ initialData, onClose }: Props) => {
+export const ManagePromptForm = ({initialData, onClose}: Props) => {
     const queryClient = useQueryClient();
     const [formData, setFormData] = React.useState({
         name: initialData?.name || '',
@@ -24,7 +24,7 @@ export const ManagePromptForm = ({ initialData, onClose }: Props) => {
                 ? updatePrompt(initialData.prompt_template_id, data)
                 : createPrompt(data),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['prompts'] });
+            queryClient.invalidateQueries({queryKey: ['prompts']});
             onClose();
         }
     });
@@ -44,7 +44,7 @@ export const ManagePromptForm = ({ initialData, onClose }: Props) => {
                     type="text"
                     id="name"
                     value={formData.name}
-                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    onChange={(e) => setFormData(prev => ({...prev, name: e.target.value}))}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     required
                 />
@@ -58,7 +58,7 @@ export const ManagePromptForm = ({ initialData, onClose }: Props) => {
                     type="text"
                     id="description"
                     value={formData.description}
-                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                    onChange={(e) => setFormData(prev => ({...prev, description: e.target.value}))}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 />
             </div>
@@ -70,7 +70,7 @@ export const ManagePromptForm = ({ initialData, onClose }: Props) => {
                 <textarea
                     id="system_prompt"
                     value={formData.system_prompt}
-                    onChange={(e) => setFormData(prev => ({ ...prev, system_prompt: e.target.value }))}
+                    onChange={(e) => setFormData(prev => ({...prev, system_prompt: e.target.value}))}
                     rows={5}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm font-mono"
                     required
@@ -84,7 +84,7 @@ export const ManagePromptForm = ({ initialData, onClose }: Props) => {
                 <textarea
                     id="user_prompt"
                     value={formData.user_prompt}
-                    onChange={(e) => setFormData(prev => ({ ...prev, user_prompt: e.target.value }))}
+                    onChange={(e) => setFormData(prev => ({...prev, user_prompt: e.target.value}))}
                     rows={5}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm font-mono"
                     required
@@ -101,7 +101,7 @@ export const ManagePromptForm = ({ initialData, onClose }: Props) => {
                             type="radio"
                             value="Y"
                             checked={formData.is_active === 'Y'}
-                            onChange={(e) => setFormData(prev => ({ ...prev, is_active: e.target.value }))}
+                            onChange={(e) => setFormData(prev => ({...prev, is_active: e.target.value}))}
                             className="form-radio h-4 w-4 text-indigo-600"
                         />
                         <span className="ml-2">활성화</span>
@@ -111,7 +111,7 @@ export const ManagePromptForm = ({ initialData, onClose }: Props) => {
                             type="radio"
                             value="N"
                             checked={formData.is_active === 'N'}
-                            onChange={(e) => setFormData(prev => ({ ...prev, is_active: e.target.value }))}
+                            onChange={(e) => setFormData(prev => ({...prev, is_active: e.target.value}))}
                             className="form-radio h-4 w-4 text-indigo-600"
                         />
                         <span className="ml-2">비활성화</span>

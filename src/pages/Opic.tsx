@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getOpics, getOpicCounts, deleteOpic } from '../api/opic';
-import { SectionType, Opic as OpicType } from '../types/opic';
-import { Plus, Edit2, Trash2, Volume2, Filter } from 'lucide-react';
-import { ManageOpicForm } from '../components/ManageOpicForm';
+import {useState} from 'react';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {deleteOpic, getOpicCounts, getOpics} from '../api/opic';
+import {Opic as OpicType, SectionType} from '../types/opic';
+import {Edit2, Filter, Plus, Trash2, Volume2} from 'lucide-react';
+import {ManageOpicForm} from '../components/ManageOpicForm';
 
 export const Opic = () => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -13,12 +13,12 @@ export const Opic = () => {
     const queryClient = useQueryClient();
     const pageSize = 10;
 
-    const { data: opicData, isLoading } = useQuery({
+    const {data: opicData, isLoading} = useQuery({
         queryKey: ['opics', currentPage, pageSize, selectedSection],
         queryFn: () => getOpics(currentPage, pageSize, selectedSection)
     });
 
-    const { data: opicCounts } = useQuery({
+    const {data: opicCounts} = useQuery({
         queryKey: ['opicCounts'],
         queryFn: getOpicCounts
     });
@@ -26,8 +26,8 @@ export const Opic = () => {
     const deleteMutation = useMutation({
         mutationFn: deleteOpic,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['opics'] });
-            queryClient.invalidateQueries({ queryKey: ['opicCounts'] });
+            queryClient.invalidateQueries({queryKey: ['opics']});
+            queryClient.invalidateQueries({queryKey: ['opicCounts']});
         }
     });
 
@@ -121,14 +121,14 @@ export const Opic = () => {
                     }}
                     className="flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
                 >
-                    <Plus className="h-4 w-4 mr-2" />
+                    <Plus className="h-4 w-4 mr-2"/>
                     새 문항
                 </button>
             </div>
 
             <div className="bg-white p-4 rounded-lg shadow-sm">
                 <div className="flex items-center space-x-4 mb-4">
-                    <Filter className="h-5 w-5 text-gray-400" />
+                    <Filter className="h-5 w-5 text-gray-400"/>
                     <div className="space-x-2">
                         <button
                             onClick={() => setSelectedSection(undefined)}
@@ -189,19 +189,19 @@ export const Opic = () => {
                                         className="p-2 text-gray-400 hover:text-gray-600 group"
                                         title="Listen to question"
                                     >
-                                        <Volume2 className="h-4 w-4 group-hover:text-blue-500" />
+                                        <Volume2 className="h-4 w-4 group-hover:text-blue-500"/>
                                     </button>
                                     <button
                                         onClick={() => handleEdit(opic)}
                                         className="p-2 text-gray-400 hover:text-gray-600"
                                     >
-                                        <Edit2 className="h-4 w-4" />
+                                        <Edit2 className="h-4 w-4"/>
                                     </button>
                                     <button
                                         onClick={() => handleDelete(opic.opic_id)}
                                         className="p-2 text-gray-400 hover:text-red-500"
                                     >
-                                        <Trash2 className="h-4 w-4" />
+                                        <Trash2 className="h-4 w-4"/>
                                     </button>
                                 </div>
                             </div>

@@ -1,7 +1,6 @@
-import { defineConfig } from 'vite';
+import {defineConfig} from 'vite';
 import react from '@vitejs/plugin-react';
-import fs from 'fs';
-import type { PreRenderedAsset } from 'rollup';
+import type {PreRenderedAsset} from 'rollup';
 
 export default defineConfig({
     plugins: [react()],

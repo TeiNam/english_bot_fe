@@ -1,19 +1,19 @@
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Settings, X } from 'lucide-react';
-import { getChatSettings, updateChatSettings } from '../api/chat';
-import { getPrompts } from '../api/prompt';
+import {useState} from 'react';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {Settings, X} from 'lucide-react';
+import {getChatSettings, updateChatSettings} from '../api/chat';
+import {getPrompts} from '../api/prompt';
 
 export const ChatSettings = () => {
     const [isOpen, setIsOpen] = useState(false);
     const queryClient = useQueryClient();
 
-    const { data: settings, isLoading: isSettingsLoading } = useQuery({
+    const {data: settings, isLoading: isSettingsLoading} = useQuery({
         queryKey: ['chatSettings'],
         queryFn: getChatSettings
     });
 
-    const { data: prompts, isLoading: isPromptsLoading } = useQuery({
+    const {data: prompts, isLoading: isPromptsLoading} = useQuery({
         queryKey: ['prompts'],
         queryFn: getPrompts
     });
@@ -21,7 +21,7 @@ export const ChatSettings = () => {
     const updateMutation = useMutation({
         mutationFn: updateChatSettings,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['chatSettings'] });
+            queryClient.invalidateQueries({queryKey: ['chatSettings']});
             setIsOpen(false);
         }
     });
@@ -46,7 +46,7 @@ export const ChatSettings = () => {
                 onClick={() => setIsOpen(true)}
                 className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
             >
-                <Settings className="h-4 w-4 mr-2" />
+                <Settings className="h-4 w-4 mr-2"/>
                 설정
             </button>
 
@@ -59,7 +59,7 @@ export const ChatSettings = () => {
                                 onClick={() => setIsOpen(false)}
                                 className="text-gray-400 hover:text-gray-500"
                             >
-                                <X className="h-5 w-5" />
+                                <X className="h-5 w-5"/>
                             </button>
                         </div>
 

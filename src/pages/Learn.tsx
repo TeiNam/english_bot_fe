@@ -1,12 +1,12 @@
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { SmallTalkList } from '../components/SmallTalkList';
-import { ManageSmallTalkForm } from '../components/ManageSmallTalkForm';
-import { ManageAnswerForm } from '../components/ManageAnswerForm';
-import { getSmallTalk, deleteSmallTalk } from '../api/smallTalk';
-import { getAnswers, deleteAnswer } from '../api/answer';
-import { Plus, Edit2, Trash2, MessageCircle, Info } from 'lucide-react';
-import { SmallTalk, Answer } from '../types/smallTalk';
+import {useState} from 'react';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {SmallTalkList} from '../components/SmallTalkList';
+import {ManageSmallTalkForm} from '../components/ManageSmallTalkForm';
+import {ManageAnswerForm} from '../components/ManageAnswerForm';
+import {deleteSmallTalk, getSmallTalk} from '../api/smallTalk';
+import {deleteAnswer, getAnswers} from '../api/answer';
+import {Edit2, Info, MessageCircle, Plus, Trash2} from 'lucide-react';
+import {Answer, SmallTalk} from '../types/smallTalk';
 
 export const Learn = () => {
     const queryClient = useQueryClient();
@@ -17,7 +17,7 @@ export const Learn = () => {
     const [editingAnswer, setEditingAnswer] = useState<Answer | null>(null);
 
     // SmallTalk Queries
-    const { data: selectedTalk, isLoading: isSmallTalkLoading, error: smallTalkError } = useQuery({
+    const {data: selectedTalk, isLoading: isSmallTalkLoading, error: smallTalkError} = useQuery({
         queryKey: ['smallTalk', selectedTalkId],
         queryFn: async () => {
             console.log('Fetching small talk details:', selectedTalkId);
@@ -43,7 +43,7 @@ export const Learn = () => {
         enabled: !!selectedTalkId
     });
 
-    const { data: answers = [], isLoading: isAnswersLoading } = useQuery({
+    const {data: answers = [], isLoading: isAnswersLoading} = useQuery({
         queryKey: ['answers', selectedTalkId],
         queryFn: () => selectedTalkId ? getAnswers(selectedTalkId) : [],
         enabled: !!selectedTalkId,
@@ -54,7 +54,7 @@ export const Learn = () => {
     const deleteTalkMutation = useMutation({
         mutationFn: deleteSmallTalk,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['smallTalks'] });
+            queryClient.invalidateQueries({queryKey: ['smallTalks']});
             setSelectedTalkId(null);
         }
     });
@@ -62,8 +62,8 @@ export const Learn = () => {
     const deleteAnswerMutation = useMutation({
         mutationFn: deleteAnswer,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['answers', selectedTalkId] });
-            queryClient.invalidateQueries({ queryKey: ['answerCounts'] });
+            queryClient.invalidateQueries({queryKey: ['answers', selectedTalkId]});
+            queryClient.invalidateQueries({queryKey: ['answerCounts']});
         }
     });
 
@@ -103,7 +103,7 @@ export const Learn = () => {
                         }}
                         className="flex items-center px-3 py-1.5 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                     >
-                        <Plus className="h-4 w-4 mr-1" />
+                        <Plus className="h-4 w-4 mr-1"/>
                         <span className="hidden md:inline">새 문장</span>
                         <span className="md:hidden">추가</span>
                     </button>
@@ -116,7 +116,7 @@ export const Learn = () => {
 
             {/* 두 번째 컬럼 - 상세 */}
             <div className="w-full md:sticky md:top-6">
-                <div className="h-[20px] md:h-[52px]" />
+                <div className="h-[20px] md:h-[52px]"/>
                 {isSmallTalkLoading ? (
                     <div className="flex justify-center items-center h-64">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"></div>
@@ -137,13 +137,13 @@ export const Learn = () => {
                                         onClick={() => handleEditSmallTalk(selectedTalk)}
                                         className="p-2 text-gray-400 hover:text-gray-500"
                                     >
-                                        <Edit2 className="h-5 w-5" />
+                                        <Edit2 className="h-5 w-5"/>
                                     </button>
                                     <button
                                         onClick={() => handleDeleteSmallTalk(selectedTalk.talk_id)}
                                         className="p-2 text-gray-400 hover:text-red-500"
                                     >
-                                        <Trash2 className="h-5 w-5" />
+                                        <Trash2 className="h-5 w-5"/>
                                     </button>
                                 </div>
                             </div>
@@ -153,7 +153,7 @@ export const Learn = () => {
                             {selectedTalk.parenthesis && (
                                 <div className="flex items-start space-x-3 text-gray-600 bg-gray-50 p-4 rounded-lg">
                                     <div className="flex-shrink-0 bg-white rounded-full p-1 shadow-sm">
-                                        <Info className="h-5 w-5 text-gray-400" />
+                                        <Info className="h-5 w-5 text-gray-400"/>
                                     </div>
                                     <pre className="whitespace-pre-wrap font-sans text-sm break-words flex-grow">
                                         {selectedTalk.parenthesis}
@@ -165,7 +165,7 @@ export const Learn = () => {
                         <div className="p-4 md:p-6">
                             <div className="flex justify-between items-center mb-4">
                                 <h3 className="text-base md:text-lg font-medium text-gray-900 flex items-center">
-                                    <MessageCircle className="h-5 w-5 mr-2" />
+                                    <MessageCircle className="h-5 w-5 mr-2"/>
                                     답변 목록
                                 </h3>
                                 <button
@@ -175,7 +175,7 @@ export const Learn = () => {
                                     }}
                                     className="flex items-center px-3 py-1 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                 >
-                                    <Plus className="h-4 w-4 mr-1" />
+                                    <Plus className="h-4 w-4 mr-1"/>
                                     <span className="hidden md:inline">답변 추가</span>
                                     <span className="md:hidden">추가</span>
                                 </button>
@@ -184,7 +184,8 @@ export const Learn = () => {
                             <div className="space-y-4">
                                 {isAnswersLoading ? (
                                     <div className="text-center py-4">
-                                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-500 mx-auto"></div>
+                                        <div
+                                            className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-500 mx-auto"></div>
                                     </div>
                                 ) : answers?.length > 0 ? (
                                     answers.map((answer) => (
@@ -206,13 +207,13 @@ export const Learn = () => {
                                                         onClick={() => handleEditAnswer(answer)}
                                                         className="p-1 text-gray-400 hover:text-gray-500"
                                                     >
-                                                        <Edit2 className="h-4 w-4" />
+                                                        <Edit2 className="h-4 w-4"/>
                                                     </button>
                                                     <button
                                                         onClick={() => handleDeleteAnswer(answer.answer_id)}
                                                         className="p-1 text-gray-400 hover:text-red-500"
                                                     >
-                                                        <Trash2 className="h-4 w-4" />
+                                                        <Trash2 className="h-4 w-4"/>
                                                     </button>
                                                 </div>
                                             </div>

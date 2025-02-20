@@ -1,7 +1,7 @@
 import React from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createAnswer, updateAnswer } from '../api/answer';
-import { Answer } from '../types/smallTalk';
+import {useMutation, useQueryClient} from '@tanstack/react-query';
+import {createAnswer, updateAnswer} from '../api/answer';
+import {Answer} from '../types/smallTalk';
 
 interface Props {
     talkId: number;
@@ -9,7 +9,7 @@ interface Props {
     onClose: () => void;
 }
 
-export const ManageAnswerForm = ({ talkId, initialData, onClose }: Props) => {
+export const ManageAnswerForm = ({talkId, initialData, onClose}: Props) => {
     const queryClient = useQueryClient();
     const [formData, setFormData] = React.useState({
         eng_sentence: initialData?.eng_sentence || '',
@@ -23,8 +23,8 @@ export const ManageAnswerForm = ({ talkId, initialData, onClose }: Props) => {
                 ? updateAnswer(initialData.answer_id, data)
                 : createAnswer(data),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['answers', talkId] });
-            queryClient.invalidateQueries({ queryKey: ['answerCounts'] });
+            queryClient.invalidateQueries({queryKey: ['answers', talkId]});
+            queryClient.invalidateQueries({queryKey: ['answerCounts']});
             onClose();
         }
     });
@@ -44,7 +44,7 @@ export const ManageAnswerForm = ({ talkId, initialData, onClose }: Props) => {
                     type="text"
                     id="eng_sentence"
                     value={formData.eng_sentence}
-                    onChange={(e) => setFormData(prev => ({ ...prev, eng_sentence: e.target.value }))}
+                    onChange={(e) => setFormData(prev => ({...prev, eng_sentence: e.target.value}))}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     required
                 />
@@ -58,7 +58,7 @@ export const ManageAnswerForm = ({ talkId, initialData, onClose }: Props) => {
                     type="text"
                     id="kor_sentence"
                     value={formData.kor_sentence}
-                    onChange={(e) => setFormData(prev => ({ ...prev, kor_sentence: e.target.value }))}
+                    onChange={(e) => setFormData(prev => ({...prev, kor_sentence: e.target.value}))}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 />
             </div>

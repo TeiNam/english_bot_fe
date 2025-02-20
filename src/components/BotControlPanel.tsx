@@ -1,11 +1,11 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getBotStatus, startBot, stopBot, sendMessageNow } from '../api/bot';
-import { Play, Pause, Send, Loader2, Clock } from 'lucide-react';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {getBotStatus, sendMessageNow, startBot, stopBot} from '../api/bot';
+import {Clock, Loader2, Pause, Play, Send} from 'lucide-react';
 
 export const BotControlPanel = () => {
     const queryClient = useQueryClient();
 
-    const { data: botStatus, isLoading: isBotStatusLoading } = useQuery({
+    const {data: botStatus, isLoading: isBotStatusLoading} = useQuery({
         queryKey: ['botStatus'],
         queryFn: getBotStatus,
         refetchInterval: 5000
@@ -14,21 +14,21 @@ export const BotControlPanel = () => {
     const startMutation = useMutation({
         mutationFn: startBot,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['botStatus'] });
+            queryClient.invalidateQueries({queryKey: ['botStatus']});
         }
     });
 
     const stopMutation = useMutation({
         mutationFn: stopBot,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['botStatus'] });
+            queryClient.invalidateQueries({queryKey: ['botStatus']});
         }
     });
 
     const sendNowMutation = useMutation({
         mutationFn: sendMessageNow,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['botStatus'] });
+            queryClient.invalidateQueries({queryKey: ['botStatus']});
         }
     });
 
@@ -86,7 +86,7 @@ export const BotControlPanel = () => {
     if (isBotStatusLoading) {
         return (
             <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-center">
-                <Loader2 className="h-5 w-5 animate-spin text-gray-500" />
+                <Loader2 className="h-5 w-5 animate-spin text-gray-500"/>
             </div>
         );
     }
@@ -98,14 +98,16 @@ export const BotControlPanel = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* 스케줄러 상태 */}
                     <div className="flex items-center space-x-2">
-                        <div className={`h-2.5 w-2.5 rounded-full ${botStatus?.scheduler.is_running ? 'bg-green-500' : 'bg-gray-400'}`} />
+                        <div
+                            className={`h-2.5 w-2.5 rounded-full ${botStatus?.scheduler.is_running ? 'bg-green-500' : 'bg-gray-400'}`}/>
                         <span className="text-sm font-medium text-gray-700">
               스케줄러: {botStatus?.scheduler.is_running ? '실행 중' : '중지됨'}
             </span>
                     </div>
                     {/* 봇 상태 */}
                     <div className="flex items-center space-x-2">
-                        <div className={`h-2.5 w-2.5 rounded-full ${botStatus?.is_running ? 'bg-green-500' : 'bg-gray-400'}`} />
+                        <div
+                            className={`h-2.5 w-2.5 rounded-full ${botStatus?.is_running ? 'bg-green-500' : 'bg-gray-400'}`}/>
                         <span className="text-sm font-medium text-gray-700">
               봇: {botStatus?.is_running ? '실행 중' : '중지됨'}
             </span>
@@ -114,7 +116,7 @@ export const BotControlPanel = () => {
 
                 {/* 타이밍 정보 */}
                 <div className="flex items-center space-x-2 text-sm text-gray-600">
-                    <Clock className="h-4 w-4" />
+                    <Clock className="h-4 w-4"/>
                     <span>마지막 메시지: {formatDateTime(botStatus?.last_message_time)}</span>
                 </div>
 
@@ -135,11 +137,11 @@ export const BotControlPanel = () => {
                         } disabled:opacity-50 disabled:cursor-not-allowed`}
                     >
                         {startMutation.isPending || stopMutation.isPending ? (
-                            <Loader2 className="h-4 w-4 animate-spin mr-1" />
+                            <Loader2 className="h-4 w-4 animate-spin mr-1"/>
                         ) : botStatus?.scheduler.is_running ? (
-                            <Pause className="h-4 w-4 mr-1" />
+                            <Pause className="h-4 w-4 mr-1"/>
                         ) : (
-                            <Play className="h-4 w-4 mr-1" />
+                            <Play className="h-4 w-4 mr-1"/>
                         )}
                         {botStatus?.scheduler.is_running ? '중지' : '시작'}
                     </button>
@@ -149,9 +151,9 @@ export const BotControlPanel = () => {
                         className="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md bg-indigo-100 text-indigo-700 hover:bg-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {sendNowMutation.isPending ? (
-                            <Loader2 className="h-4 w-4 animate-spin mr-1" />
+                            <Loader2 className="h-4 w-4 animate-spin mr-1"/>
                         ) : (
-                            <Send className="h-4 w-4 mr-1" />
+                            <Send className="h-4 w-4 mr-1"/>
                         )}
                         즉시 전송
                     </button>

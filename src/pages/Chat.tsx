@@ -1,20 +1,15 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Send, Plus, Trash2, ArrowLeft, Loader2 } from 'lucide-react';
-import { ConversationHistory, ConversationListResponse } from '../types/chat';
-import { ChatSettings } from '../components/ChatSettings';
-import { ChatMessages } from '../components/ChatMessages';
-import {
-    getConversations,
-    getChatHistory,
-    deleteConversation as deleteConversationApi,
-    streamChat
-} from '../api/chat';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {useNavigate, useParams} from 'react-router-dom';
+import {ArrowLeft, Loader2, Plus, Send, Trash2} from 'lucide-react';
+import {ConversationHistory, ConversationListResponse} from '../types/chat';
+import {ChatSettings} from '../components/ChatSettings';
+import {ChatMessages} from '../components/ChatMessages';
+import {deleteConversation as deleteConversationApi, getChatHistory, getConversations, streamChat} from '../api/chat';
 import "../index.css"; // CSS 파일 경로 (실제 위치에 맞게 수정)
 
 export const Chat = () => {
-    const { conversationId } = useParams();
+    const {conversationId} = useParams();
     const [message, setMessage] = useState('');
     const [isStreaming, setIsStreaming] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -31,7 +26,7 @@ export const Chat = () => {
     const approximateTokenCount = (text: string) => Math.ceil(text.length / 4);
 
     // 대화 목록 조회
-    const { data: conversations } = useQuery({
+    const {data: conversations} = useQuery({
         queryKey: ['conversations'],
         queryFn: getConversations,
         staleTime: 60 * 1000,
@@ -39,7 +34,7 @@ export const Chat = () => {
     });
 
     // 현재 대화 히스토리 조회
-    const { data: chatHistory } = useQuery({
+    const {data: chatHistory} = useQuery({
         queryKey: ['chatHistory', conversationId],
         queryFn: () => (conversationId ? getChatHistory(conversationId) : Promise.resolve([])),
         enabled: !!conversationId,
@@ -50,13 +45,13 @@ export const Chat = () => {
     const deleteConversation = useMutation({
         mutationFn: deleteConversationApi,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['conversations'] });
+            queryClient.invalidateQueries({queryKey: ['conversations']});
             navigate('/chat');
         },
     });
 
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        messagesEndRef.current?.scrollIntoView({behavior: 'smooth'});
     }, [chatHistory, typedMessage]);
 
     // 자연스러운 타이핑 효과 함수 (단어 단위)
@@ -146,9 +141,9 @@ export const Chat = () => {
             const decoder = new TextDecoder('utf-8');
             let fullResponse = '';
             while (true) {
-                const { done, value } = await reader.read();
+                const {done, value} = await reader.read();
                 if (done) break;
-                const chunk = decoder.decode(value, { stream: true });
+                const chunk = decoder.decode(value, {stream: true});
                 fullResponse += chunk;
             }
             decoder.decode();
@@ -163,7 +158,7 @@ export const Chat = () => {
             setTokenCount(totalTokens);
             setCost(totalTokens * COST_PER_TOKEN);
 
-            await queryClient.invalidateQueries({ queryKey: ['conversations'] });
+            await queryClient.invalidateQueries({queryKey: ['conversations']});
             await queryClient.invalidateQueries({
                 queryKey: ['chatHistory', targetConversationId || conversationId],
             });
@@ -198,7 +193,7 @@ export const Chat = () => {
     const handleDeleteChat = async () => {
         if (!conversationId) return;
         if (window.confirm('정말로 이 대화를 삭제하시겠습니까?')) {
-            queryClient.removeQueries({ queryKey: ['chatHistory', conversationId] });
+            queryClient.removeQueries({queryKey: ['chatHistory', conversationId]});
             await deleteConversation.mutateAsync(conversationId);
             navigate('/chat');
         }
@@ -216,16 +211,18 @@ export const Chat = () => {
 
     return (
         // 전체 그리드 컨테이너의 높이를 줄여서 입력 영역이 보이도록 수정 (h-[calc(100vh-8rem)])
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 h-[calc(100vh-4rem)] md:h-[calc(100vh-8rem)] bg-white safe-area-inset-bottom">
+        <div
+            className="grid grid-cols-1 md:grid-cols-4 gap-4 h-[calc(100vh-4rem)] md:h-[calc(100vh-8rem)] bg-white safe-area-inset-bottom">
             {/* Sidebar */}
-            <div className="hidden md:flex flex-col bg-white p-3 md:p-4 border-r border-gray-200 overflow-y-auto h-full">
+            <div
+                className="hidden md:flex flex-col bg-white p-3 md:p-4 border-r border-gray-200 overflow-y-auto h-full">
                 <div className="flex space-x-2 mb-4">
-                    <ChatSettings />
+                    <ChatSettings/>
                     <button
                         onClick={handleNewChat}
                         className="flex items-center justify-center px-3 md:px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
                     >
-                        <Plus className="h-4 w-4 mr-2" />
+                        <Plus className="h-4 w-4 mr-2"/>
                         새 대화
                     </button>
                 </div>
@@ -260,7 +257,7 @@ export const Chat = () => {
                                 className="p-1 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
                                 aria-label="대화 삭제"
                             >
-                                <Trash2 className="h-4 w-4" />
+                                <Trash2 className="h-4 w-4"/>
                             </button>
                         </div>
                     ))}
@@ -273,7 +270,7 @@ export const Chat = () => {
                 <div className="flex items-center justify-between p-2 md:p-3 border-b border-gray-200 bg-white">
                     <div className="flex items-center space-x-4">
                         <button onClick={() => navigate('/chat')} className="md:hidden p-2">
-                            <ArrowLeft className="h-4 w-4 text-gray-500" />
+                            <ArrowLeft className="h-4 w-4 text-gray-500"/>
                         </button>
                         <h1 className="text-base font-semibold text-gray-900">
                             {conversationId ? '대화 계속하기' : '새 대화'}
@@ -281,22 +278,24 @@ export const Chat = () => {
                     </div>
                     {conversationId && (
                         <button onClick={handleDeleteChat} className="text-gray-400 hover:text-red-500">
-                            <Trash2 className="h-5 w-5" title="대화 삭제" />
+                            <Trash2 className="h-5 w-5" title="대화 삭제"/>
                         </button>
                     )}
                 </div>
 
                 {/* Message list */}
-                <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-3 md:space-y-4 min-h-0 bg-gray-50 pb-[200px] md:pb-[220px]">
+                <div
+                    className="flex-1 overflow-y-auto p-3 md:p-4 space-y-3 md:space-y-4 min-h-0 bg-gray-50 pb-[200px] md:pb-[220px]">
                     {/* Existing chat history */}
-                    {chatHistory && <ChatMessages messages={chatHistory} />}
+                    {chatHistory && <ChatMessages messages={chatHistory}/>}
 
                     {/* Local messages with typing effect */}
                     {localMessages.map((msg: ConversationHistory) => (
                         <div key={msg.chat_history_id} className="space-y-3">
                             <div className="flex flex-col space-y-3">
                                 <div className="flex justify-end">
-                                    <div className="bg-indigo-100 rounded-2xl px-3 md:px-4 py-2 max-w-[90%] md:max-w-[85%]">
+                                    <div
+                                        className="bg-indigo-100 rounded-2xl px-3 md:px-4 py-2 max-w-[90%] md:max-w-[85%]">
                                         <p className="text-gray-900 whitespace-pre-wrap">
                                             {msg.user_message}
                                         </p>
@@ -304,7 +303,8 @@ export const Chat = () => {
                                 </div>
                                 {typedMessage && (
                                     <div className="flex justify-start">
-                                        <div className="bg-white rounded-2xl px-3 md:px-4 py-2 max-w-[90%] md:max-w-[85%] shadow-sm">
+                                        <div
+                                            className="bg-white rounded-2xl px-3 md:px-4 py-2 max-w-[90%] md:max-w-[85%] shadow-sm">
                                             <p className="text-gray-900 whitespace-pre-wrap fade-in">
                                                 {typedMessage}
                                             </p>
@@ -320,15 +320,18 @@ export const Chat = () => {
                         <div className="flex justify-start">
                             <div className="bg-white rounded-2xl px-4 py-2 shadow-sm">
                                 <div className="flex items-center space-x-2">
-                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                                         style={{animationDelay: '0ms'}}/>
+                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                                         style={{animationDelay: '150ms'}}/>
+                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                                         style={{animationDelay: '300ms'}}/>
                                 </div>
                             </div>
                         </div>
                     )}
 
-                    <div ref={messagesEndRef} />
+                    <div ref={messagesEndRef}/>
                 </div>
 
                 {/* Token and cost info */}
@@ -357,9 +360,9 @@ export const Chat = () => {
                                 className="p-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center w-14"
                             >
                                 {isStreaming ? (
-                                    <Loader2 className="h-5 w-5 animate-spin" />
+                                    <Loader2 className="h-5 w-5 animate-spin"/>
                                 ) : (
-                                    <Send className="h-5 w-5" />
+                                    <Send className="h-5 w-5"/>
                                 )}
                             </button>
                         </div>
@@ -371,10 +374,10 @@ export const Chat = () => {
                                     onClick={handleNewChat}
                                     className="flex items-center flex-1 px-3 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50 rounded-lg"
                                 >
-                                    <Plus className="h-4 w-4 mr-2" />
+                                    <Plus className="h-4 w-4 mr-2"/>
                                     새 대화
                                 </button>
-                                <ChatSettings />
+                                <ChatSettings/>
                             </div>
                             {conversations?.map((conv: ConversationListResponse) => (
                                 <div
@@ -402,7 +405,7 @@ export const Chat = () => {
                                         }}
                                         className="p-1 text-gray-400 hover:text-red-500"
                                     >
-                                        <Trash2 className="h-4 w-4" />
+                                        <Trash2 className="h-4 w-4"/>
                                     </button>
                                 </div>
                             ))}

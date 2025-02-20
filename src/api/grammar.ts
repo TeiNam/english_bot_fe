@@ -1,9 +1,9 @@
 import axiosClient from './axiosClient';
-import { Grammar, GrammarResponse } from '../types/grammar';
+import {Grammar, GrammarResponse} from '../types/grammar';
 
 export const getGrammars = async (page: number = 1, size: number = 10): Promise<GrammarResponse> => {
     const response = await axiosClient.get<GrammarResponse>('/grammar/', {
-        params: { page, size }
+        params: {page, size}
     });
     return response.data;
 };

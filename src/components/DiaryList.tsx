@@ -1,20 +1,20 @@
-import { useQuery, keepPreviousData, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getDiaries, deleteDiary } from '../api/diary';
-import { Calendar, ChevronLeft, ChevronRight, Trash2, Sparkles, Loader2, Edit2 } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { Diary } from '../types/diary';
+import {keepPreviousData, useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {deleteDiary, getDiaries} from '../api/diary';
+import {Calendar, ChevronLeft, ChevronRight, Edit2, Sparkles, Trash2} from 'lucide-react';
+import {useEffect, useState} from 'react';
+import {Diary} from '../types/diary';
 
 interface Props {
     onEdit: (diary: Diary) => void;
 }
 
-export const DiaryList = ({ onEdit }: Props) => {
+export const DiaryList = ({onEdit}: Props) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [expandedDiaryIds, setExpandedDiaryIds] = useState<Set<number>>(new Set());
     const pageSize = 10;
     const queryClient = useQueryClient();
 
-    const { data, isLoading } = useQuery({
+    const {data, isLoading} = useQuery({
         queryKey: ['diaries', currentPage, pageSize],
         queryFn: () => getDiaries(currentPage, pageSize),
         placeholderData: keepPreviousData,
@@ -24,8 +24,8 @@ export const DiaryList = ({ onEdit }: Props) => {
     const deleteMutation = useMutation({
         mutationFn: deleteDiary,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['diaries'] });
-            queryClient.invalidateQueries({ queryKey: ['diary'] });
+            queryClient.invalidateQueries({queryKey: ['diaries']});
+            queryClient.invalidateQueries({queryKey: ['diary']});
         }
     });
 
@@ -86,7 +86,7 @@ export const DiaryList = ({ onEdit }: Props) => {
                 >
                     <div className="flex items-center justify-between">
                         <div className="flex items-center text-sm text-gray-500">
-                            <Calendar className="h-4 w-4 mr-1" />
+                            <Calendar className="h-4 w-4 mr-1"/>
                             {new Date(diary.date).toLocaleDateString('ko-KR', {
                                 year: 'numeric',
                                 month: 'long',
@@ -102,7 +102,7 @@ export const DiaryList = ({ onEdit }: Props) => {
                                 className="p-1 text-gray-400 hover:text-indigo-600 transition-colors"
                                 title="일기 수정"
                             >
-                                <Edit2 className="h-4 w-4" />
+                                <Edit2 className="h-4 w-4"/>
                             </button>
                             <button
                                 onClick={(e) => {
@@ -112,7 +112,7 @@ export const DiaryList = ({ onEdit }: Props) => {
                                 className="p-1 text-gray-400 hover:text-red-500 transition-colors"
                                 title="일기 삭제"
                             >
-                                <Trash2 className="h-4 w-4" />
+                                <Trash2 className="h-4 w-4"/>
                             </button>
                         </div>
                     </div>
@@ -125,7 +125,7 @@ export const DiaryList = ({ onEdit }: Props) => {
                                 {diary.feedback ? (
                                     <div className="p-4 bg-gray-50 rounded-md border border-gray-200">
                                         <div className="flex items-center space-x-2 mb-3">
-                                            <Sparkles className="h-4 w-4 text-gray-600" />
+                                            <Sparkles className="h-4 w-4 text-gray-600"/>
                                             <span className="text-base font-medium text-gray-900">AI Feedback</span>
                                         </div>
                                         <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
@@ -150,7 +150,7 @@ export const DiaryList = ({ onEdit }: Props) => {
                         disabled={!data.has_prev}
                         className="p-2 rounded-md hover:bg-gray-100 disabled:opacity-50"
                     >
-                        <ChevronLeft className="h-5 w-5" />
+                        <ChevronLeft className="h-5 w-5"/>
                     </button>
                     <span className="text-sm text-gray-600">
                         Page {data.page} of {data.total_pages}
@@ -160,7 +160,7 @@ export const DiaryList = ({ onEdit }: Props) => {
                         disabled={!data.has_next}
                         className="p-2 rounded-md hover:bg-gray-100 disabled:opacity-50"
                     >
-                        <ChevronRight className="h-5 w-5" />
+                        <ChevronRight className="h-5 w-5"/>
                     </button>
                 </div>
             )}

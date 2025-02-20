@@ -1,12 +1,12 @@
 import axiosClient from './axiosClient';
-import { Opic, OpicResponse, OpicCount, SectionType } from '../types/opic';
+import {Opic, OpicCount, OpicResponse, SectionType} from '../types/opic';
 
 export const getOpics = async (
     page: number = 1,
     size: number = 10,
     section?: SectionType
 ): Promise<OpicResponse> => {
-    const params = { page, size, ...(section && { section }) };
+    const params = {page, size, ...(section && {section})};
     const response = await axiosClient.get<OpicResponse>('/opic/', {
         params
     });

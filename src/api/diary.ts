@@ -1,5 +1,5 @@
 import axiosClient from './axiosClient';
-import { Diary, PageResponse, DiaryCreate, DiaryUpdate } from '../types/diary';
+import {Diary, DiaryCreate, DiaryUpdate, PageResponse} from '../types/diary';
 
 export const getDiaries = async (page: number = 1, size: number = 10): Promise<PageResponse<Diary>> => {
     const response = await axiosClient.get<PageResponse<Diary>>('/diary', {
@@ -35,7 +35,7 @@ export const createDiary = async (data: DiaryCreate): Promise<Diary> => {
 };
 
 export const updateDiary = async (diaryId: number, data: DiaryUpdate): Promise<Diary> => {
-    console.log('Updating diary with data:', { diaryId, data });
+    console.log('Updating diary with data:', {diaryId, data});
     const response = await axiosClient.put<Diary>(
         `/diary/${diaryId}`,
         data,

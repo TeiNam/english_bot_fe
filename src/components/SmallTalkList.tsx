@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { getSmallTalks } from '../api/smallTalk';
-import { getAnswerCount } from '../api/answer';
-import { MessageSquare, Calendar, Tag, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import {useState} from 'react';
+import {keepPreviousData, useQuery} from '@tanstack/react-query';
+import {getSmallTalks} from '../api/smallTalk';
+import {getAnswerCounts} from '../api/answer';
+import {Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, MessageSquare, Tag} from 'lucide-react';
 
 interface Props {
     onSelectTalk: (talkId: number) => void;
@@ -10,10 +10,10 @@ interface Props {
     pageSize?: number; // Add optional pageSize prop
 }
 
-export const SmallTalkList = ({ onSelectTalk, selectedTalkId, pageSize = 10 }: Props) => {
+export const SmallTalkList = ({onSelectTalk, selectedTalkId, pageSize = 10}: Props) => {
     const [currentPage, setCurrentPage] = useState<number>(1);
 
-    const { data, isLoading, error } = useQuery({
+    const {data, isLoading, error} = useQuery({
         queryKey: ['smallTalks', currentPage, pageSize],
         queryFn: () => getSmallTalks(currentPage, pageSize),
         placeholderData: keepPreviousData,
@@ -21,11 +21,12 @@ export const SmallTalkList = ({ onSelectTalk, selectedTalkId, pageSize = 10 }: P
     });
 
     // 답변 개수를 가져오는 쿼리 최적화
-    const { data: answerCountsData } = useQuery({
+    const {data: answerCountsData} = useQuery({
         queryKey: ['answerCounts', data?.items?.map(talk => talk.talk_id).join(',')],
         queryFn: async () => {
             if (!data?.items?.length) return {};
-            return getAnswerCounts(data.items.map(talk => talk.talk_id));
+            const talkIds = data.items.map(talk => talk.talk_id);
+            return getAnswerCounts(talkIds);
         },
         enabled: !!data?.items?.length,
         staleTime: 1000 * 60 * 5,
@@ -118,16 +119,16 @@ export const SmallTalkList = ({ onSelectTalk, selectedTalkId, pageSize = 10 }: P
                         </h3>
                         <div className="flex items-center space-x-4 text-sm text-gray-500">
               <span className="flex items-center">
-                <MessageSquare className="h-4 w-4 mr-1" />
+                <MessageSquare className="h-4 w-4 mr-1"/>
                   {answerCountsData?.[talk.talk_id] ?? 0} 답변
               </span>
                             <span className="flex items-center">
-                <Calendar className="h-4 w-4 mr-1" />
+                <Calendar className="h-4 w-4 mr-1"/>
                                 {formatDate(talk.create_at)}
               </span>
                             {talk.tag && (
                                 <span className="flex items-center">
-                  <Tag className="h-4 w-4 mr-1" />
+                  <Tag className="h-4 w-4 mr-1"/>
                                     {talk.tag}
                 </span>
                             )}
@@ -144,7 +145,7 @@ export const SmallTalkList = ({ onSelectTalk, selectedTalkId, pageSize = 10 }: P
                         className="p-2 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="첫 페이지"
                     >
-                        <ChevronsLeft className="h-4 w-4" />
+                        <ChevronsLeft className="h-4 w-4"/>
                     </button>
                     <button
                         onClick={() => handlePageChange(currentPage - 1)}
@@ -152,7 +153,7 @@ export const SmallTalkList = ({ onSelectTalk, selectedTalkId, pageSize = 10 }: P
                         className="p-2 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="이전 페이지"
                     >
-                        <ChevronLeft className="h-4 w-4" />
+                        <ChevronLeft className="h-4 w-4"/>
                     </button>
 
                     {getPageNumbers().map(pageNum => (
@@ -175,7 +176,7 @@ export const SmallTalkList = ({ onSelectTalk, selectedTalkId, pageSize = 10 }: P
                         className="p-2 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="다음 페이지"
                     >
-                        <ChevronRight className="h-4 w-4" />
+                        <ChevronRight className="h-4 w-4"/>
                     </button>
                     <button
                         onClick={() => handlePageChange(data.total_pages)}
@@ -183,7 +184,7 @@ export const SmallTalkList = ({ onSelectTalk, selectedTalkId, pageSize = 10 }: P
                         className="p-2 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="마지막 페이지"
                     >
-                        <ChevronsRight className="h-4 w-4" />
+                        <ChevronsRight className="h-4 w-4"/>
                     </button>
                 </div>
             )}

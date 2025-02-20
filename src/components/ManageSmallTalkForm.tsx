@@ -1,15 +1,15 @@
 import React from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createSmallTalk, updateSmallTalk } from '../api/smallTalk';
-import { SmallTalk } from '../types/smallTalk';
-import { Info } from 'lucide-react';
+import {useMutation, useQueryClient} from '@tanstack/react-query';
+import {createSmallTalk, updateSmallTalk} from '../api/smallTalk';
+import {SmallTalk} from '../types/smallTalk';
+import {Info} from 'lucide-react';
 
 interface Props {
     initialData?: SmallTalk;
     onClose: () => void;
 }
 
-export const ManageSmallTalkForm = ({ initialData, onClose }: Props) => {
+export const ManageSmallTalkForm = ({initialData, onClose}: Props) => {
     const queryClient = useQueryClient();
     const [formData, setFormData] = React.useState({
         eng_sentence: initialData?.eng_sentence || '',
@@ -25,7 +25,7 @@ export const ManageSmallTalkForm = ({ initialData, onClose }: Props) => {
                 : createSmallTalk(data),
         onSuccess: async (data) => {
             // 전체 목록 갱신
-            await queryClient.invalidateQueries({ queryKey: ['smallTalks'] });
+            await queryClient.invalidateQueries({queryKey: ['smallTalks']});
 
             // 개별 상세 데이터 갱신
             if (initialData) {
@@ -58,7 +58,7 @@ export const ManageSmallTalkForm = ({ initialData, onClose }: Props) => {
                     type="text"
                     id="eng_sentence"
                     value={formData.eng_sentence}
-                    onChange={(e) => setFormData(prev => ({ ...prev, eng_sentence: e.target.value }))}
+                    onChange={(e) => setFormData(prev => ({...prev, eng_sentence: e.target.value}))}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     required
                 />
@@ -72,7 +72,7 @@ export const ManageSmallTalkForm = ({ initialData, onClose }: Props) => {
                     type="text"
                     id="kor_sentence"
                     value={formData.kor_sentence}
-                    onChange={(e) => setFormData(prev => ({ ...prev, kor_sentence: e.target.value }))}
+                    onChange={(e) => setFormData(prev => ({...prev, kor_sentence: e.target.value}))}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 />
             </div>
@@ -80,17 +80,17 @@ export const ManageSmallTalkForm = ({ initialData, onClose }: Props) => {
             <div>
                 <label htmlFor="parenthesis" className="block text-sm font-medium text-gray-700 mb-1">
                     <div className="flex items-center space-x-2">
-                        <Info className="h-4 w-4 text-gray-400" />
+                        <Info className="h-4 w-4 text-gray-400"/>
                         <span>부가 설명</span>
                     </div>
                 </label>
                 <textarea
                     id="parenthesis"
                     value={formData.parenthesis}
-                    onChange={(e) => setFormData(prev => ({ ...prev, parenthesis: e.target.value }))}
+                    onChange={(e) => setFormData(prev => ({...prev, parenthesis: e.target.value}))}
                     rows={5}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm font-sans"
-                    style={{ whiteSpace: 'pre-wrap' }}
+                    style={{whiteSpace: 'pre-wrap'}}
                 />
             </div>
 
@@ -102,7 +102,7 @@ export const ManageSmallTalkForm = ({ initialData, onClose }: Props) => {
                     type="text"
                     id="tag"
                     value={formData.tag}
-                    onChange={(e) => setFormData(prev => ({ ...prev, tag: e.target.value }))}
+                    onChange={(e) => setFormData(prev => ({...prev, tag: e.target.value}))}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 />
             </div>

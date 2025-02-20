@@ -1,7 +1,7 @@
-import { DiaryEditor } from '../components/DiaryEditor';
-import { DiaryList } from '../components/DiaryList';
-import { useState } from 'react';
-import { Diary as DiaryType } from '../types/diary';
+import {DiaryEditor} from '../components/DiaryEditor';
+import {DiaryList} from '../components/DiaryList';
+import {useState} from 'react';
+import {Diary as DiaryType} from '../types/diary';
 
 export const Diary = () => {
     const [editingDiary, setEditingDiary] = useState<DiaryType | null>(null);
@@ -16,7 +16,7 @@ export const Diary = () => {
                     initialDiary={editingDiary}
                     onSaved={() => setEditingDiary(null)}
                 />
-                <DiaryList onEdit={setEditingDiary} />
+                <DiaryList onEdit={setEditingDiary}/>
             </div>
         </div>
     );

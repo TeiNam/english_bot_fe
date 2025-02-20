@@ -119,4 +119,4 @@ export const log = {
 };
 
 // 타입 익스포트
-export type { Config };
+export type {Config};

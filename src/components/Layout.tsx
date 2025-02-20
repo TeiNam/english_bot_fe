@@ -1,13 +1,13 @@
-import { Outlet, Link, useLocation, Navigate } from 'react-router-dom';
-import { useAuthStore } from '../store/authStore';
-import { LogOut } from 'lucide-react';
+import {Link, Navigate, Outlet, useLocation} from 'react-router-dom';
+import {useAuthStore} from '../store/authStore';
+import {LogOut} from 'lucide-react';
 
 export const Layout = () => {
-    const { pathname } = useLocation();
-    const { token, logout } = useAuthStore();
+    const {pathname} = useLocation();
+    const {token, logout} = useAuthStore();
 
     if (!token) {
-        return <Navigate to="/login" replace />;
+        return <Navigate to="/login" replace/>;
     }
 
     return (
@@ -104,7 +104,7 @@ export const Layout = () => {
                                 onClick={() => logout()}
                                 className="flex items-center text-gray-500 hover:text-gray-700"
                             >
-                                <LogOut className="h-5 w-5 mr-1" />
+                                <LogOut className="h-5 w-5 mr-1"/>
                                 Logout
                             </button>
                         </div>
@@ -113,7 +113,7 @@ export const Layout = () => {
             </nav>
 
             <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-                <Outlet />
+                <Outlet/>
             </main>
         </div>
     );

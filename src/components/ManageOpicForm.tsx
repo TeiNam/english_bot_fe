@@ -1,14 +1,14 @@
 import React from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createOpic, updateOpic } from '../api/opic';
-import { Opic, SectionType } from '../types/opic';
+import {useMutation, useQueryClient} from '@tanstack/react-query';
+import {createOpic, updateOpic} from '../api/opic';
+import {Opic, SectionType} from '../types/opic';
 
 interface Props {
     initialData?: Opic;
     onClose: () => void;
 }
 
-export const ManageOpicForm = ({ initialData, onClose }: Props) => {
+export const ManageOpicForm = ({initialData, onClose}: Props) => {
     const queryClient = useQueryClient();
     const [formData, setFormData] = React.useState({
         section: initialData?.section || 'General-Topics' as SectionType,
@@ -22,8 +22,8 @@ export const ManageOpicForm = ({ initialData, onClose }: Props) => {
                 ? updateOpic(initialData.opic_id, data)
                 : createOpic(data),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['opics'] });
-            queryClient.invalidateQueries({ queryKey: ['opicCounts'] });
+            queryClient.invalidateQueries({queryKey: ['opics']});
+            queryClient.invalidateQueries({queryKey: ['opicCounts']});
             onClose();
         }
     });
@@ -41,7 +41,7 @@ export const ManageOpicForm = ({ initialData, onClose }: Props) => {
                 </label>
                 <select
                     value={formData.section}
-                    onChange={(e) => setFormData(prev => ({ ...prev, section: e.target.value as SectionType }))}
+                    onChange={(e) => setFormData(prev => ({...prev, section: e.target.value as SectionType}))}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 >
                     <option value="General-Topics">General Topics</option>
@@ -57,7 +57,7 @@ export const ManageOpicForm = ({ initialData, onClose }: Props) => {
                     type="text"
                     id="survey"
                     value={formData.survey}
-                    onChange={(e) => setFormData(prev => ({ ...prev, survey: e.target.value }))}
+                    onChange={(e) => setFormData(prev => ({...prev, survey: e.target.value}))}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     required
                 />
@@ -70,7 +70,7 @@ export const ManageOpicForm = ({ initialData, onClose }: Props) => {
                 <textarea
                     id="question"
                     value={formData.question}
-                    onChange={(e) => setFormData(prev => ({ ...prev, question: e.target.value }))}
+                    onChange={(e) => setFormData(prev => ({...prev, question: e.target.value}))}
                     rows={4}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     required

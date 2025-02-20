@@ -1,21 +1,21 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getVocabulary, updateVocabulary } from '../api/vocabulary';
-import { Book, Info, Plus, Edit2, Trash2 } from 'lucide-react';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {getVocabulary, updateVocabulary} from '../api/vocabulary';
+import {Book, Edit2, Info, Plus, Trash2} from 'lucide-react';
 import ManageVocabularyMeaningForm from './ManageVocabularyMeaningForm';
-import { useState } from 'react';
-import { VocabularyMeaning } from '../types/vocabulary';
+import {useState} from 'react';
+import {VocabularyMeaning} from '../types/vocabulary';
 
 interface Props {
     vocabularyId: number;
     onClose: () => void;
 }
 
-export const VocabularyDetail = ({ vocabularyId, onClose }: Props) => {
+export const VocabularyDetail = ({vocabularyId, onClose}: Props) => {
     const [isAddingMeaning, setIsAddingMeaning] = useState(false);
     const [editingMeaning, setEditingMeaning] = useState<VocabularyMeaning | null>(null);
     const queryClient = useQueryClient();
 
-    const { data: vocabulary, isLoading } = useQuery({
+    const {data: vocabulary, isLoading} = useQuery({
         queryKey: ['vocabulary', vocabularyId],
         queryFn: () => getVocabulary(vocabularyId)
     });
@@ -25,7 +25,7 @@ export const VocabularyDetail = ({ vocabularyId, onClose }: Props) => {
             return updateVocabulary(vocabularyId, updatedVocabulary);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['vocabulary', vocabularyId] });
+            queryClient.invalidateQueries({queryKey: ['vocabulary', vocabularyId]});
         }
     });
 
@@ -56,7 +56,7 @@ export const VocabularyDetail = ({ vocabularyId, onClose }: Props) => {
             ...vocabulary,
             meanings: vocabulary.meanings.map(m =>
                 m.meaning_id === editingMeaning.meaning_id
-                    ? { ...m, ...meaningData }
+                    ? {...m, ...meaningData}
                     : m
             )
         };
@@ -80,7 +80,7 @@ export const VocabularyDetail = ({ vocabularyId, onClose }: Props) => {
             return updateVocabulary(vocabularyId, updatedVocabulary);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['vocabulary', vocabularyId] });
+            queryClient.invalidateQueries({queryKey: ['vocabulary', vocabularyId]});
             setIsAddingMeaning(false);
         }
     });
@@ -110,7 +110,7 @@ export const VocabularyDetail = ({ vocabularyId, onClose }: Props) => {
             <div className="p-6">
                 <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg font-medium text-gray-900 flex items-center">
-                        <Book className="h-5 w-5 mr-2" />
+                        <Book className="h-5 w-5 mr-2"/>
                         의미
                     </h3>
                     <button
@@ -120,7 +120,7 @@ export const VocabularyDetail = ({ vocabularyId, onClose }: Props) => {
                         }}
                         className="flex items-center px-3 py-1 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                     >
-                        <Plus className="h-4 w-4 mr-1" />
+                        <Plus className="h-4 w-4 mr-1"/>
                         의미 추가
                     </button>
                 </div>
@@ -136,13 +136,13 @@ export const VocabularyDetail = ({ vocabularyId, onClose }: Props) => {
                                     onClick={() => handleEditMeaning(meaning)}
                                     className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
                                 >
-                                    <Edit2 className="h-4 w-4" />
+                                    <Edit2 className="h-4 w-4"/>
                                 </button>
                                 <button
                                     onClick={() => handleDeleteMeaning(meaning.meaning_id)}
                                     className="p-1 text-gray-400 hover:text-red-500 transition-colors"
                                 >
-                                    <Trash2 className="h-4 w-4" />
+                                    <Trash2 className="h-4 w-4"/>
                                 </button>
                             </div>
                             <div className="space-y-2 pr-16">
@@ -164,9 +164,11 @@ export const VocabularyDetail = ({ vocabularyId, onClose }: Props) => {
                                     </p>
                                 )}
                                 {meaning.parenthesis && (
-                                    <div className="flex items-start space-x-2 text-sm text-gray-500 bg-gray-50 p-3 rounded">
-                                        <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                                        <pre className="whitespace-pre-wrap font-sans break-words flex-grow">{meaning.parenthesis}</pre>
+                                    <div
+                                        className="flex items-start space-x-2 text-sm text-gray-500 bg-gray-50 p-3 rounded">
+                                        <Info className="h-4 w-4 mt-0.5 flex-shrink-0"/>
+                                        <pre
+                                            className="whitespace-pre-wrap font-sans break-words flex-grow">{meaning.parenthesis}</pre>
                                     </div>
                                 )}
                             </div>

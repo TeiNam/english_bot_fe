@@ -1,15 +1,15 @@
-import React, { useEffect } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createGrammar, updateGrammar } from '../api/grammar';
-import { Grammar } from '../types/grammar';
-import { Loader2, Play } from 'lucide-react';
+import React, {useEffect} from 'react';
+import {useMutation, useQueryClient} from '@tanstack/react-query';
+import {createGrammar, updateGrammar} from '../api/grammar';
+import {Grammar} from '../types/grammar';
+import {Loader2, Play} from 'lucide-react';
 
 interface Props {
     initialData?: Grammar;
     onClose: () => void;
 }
 
-export const ManageGrammarForm = ({ initialData, onClose }: Props) => {
+export const ManageGrammarForm = ({initialData, onClose}: Props) => {
     const queryClient = useQueryClient();
     const [formData, setFormData] = React.useState({
         title: initialData?.title || '',
@@ -25,7 +25,7 @@ export const ManageGrammarForm = ({ initialData, onClose }: Props) => {
                 ? updateGrammar(initialData.grammar_id, data)
                 : createGrammar(data),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['grammars'] });
+            queryClient.invalidateQueries({queryKey: ['grammars']});
             if (initialData) {
                 queryClient.invalidateQueries({
                     queryKey: ['grammar', initialData.grammar_id]
@@ -67,7 +67,7 @@ export const ManageGrammarForm = ({ initialData, onClose }: Props) => {
                 try {
                     const title = await fetchYouTubeTitle(newVideoId);
                     if (title) {
-                        setFormData(prev => ({ ...prev, title }));
+                        setFormData(prev => ({...prev, title}));
                     }
                 } catch (error) {
                     console.error('Error fetching title:', error);
@@ -94,14 +94,14 @@ export const ManageGrammarForm = ({ initialData, onClose }: Props) => {
                         type="text"
                         id="title"
                         value={formData.title}
-                        onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                        onChange={(e) => setFormData(prev => ({...prev, title: e.target.value}))}
                         className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         required
                         disabled={isFetchingTitle}
                     />
                     {isFetchingTitle && (
                         <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
-                            <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+                            <Loader2 className="h-5 w-5 animate-spin text-gray-400"/>
                         </div>
                     )}
                 </div>
@@ -116,7 +116,7 @@ export const ManageGrammarForm = ({ initialData, onClose }: Props) => {
                     type="url"
                     id="url"
                     value={formData.url}
-                    onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
+                    onChange={(e) => setFormData(prev => ({...prev, url: e.target.value}))}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     placeholder="https://youtube.com/..."
                 />
@@ -133,10 +133,11 @@ export const ManageGrammarForm = ({ initialData, onClose }: Props) => {
                         className="absolute top-0 left-0 w-full h-full rounded-lg"
                     ></iframe>
                 ) : (
-                    <div className="absolute top-0 left-0 w-full h-full bg-gray-100 rounded-lg flex items-center justify-center">
+                    <div
+                        className="absolute top-0 left-0 w-full h-full bg-gray-100 rounded-lg flex items-center justify-center">
                         <div className="text-center text-gray-500">
-                            <Play className="h-12 w-12 mx-auto mb-2" />
-                            <p>YouTube URL을 입력하면<br />영상이 여기에 표시됩니다</p>
+                            <Play className="h-12 w-12 mx-auto mb-2"/>
+                            <p>YouTube URL을 입력하면<br/>영상이 여기에 표시됩니다</p>
                         </div>
                     </div>
                 )}
@@ -150,7 +151,7 @@ export const ManageGrammarForm = ({ initialData, onClose }: Props) => {
                 <textarea
                     id="body"
                     value={formData.body}
-                    onChange={(e) => setFormData(prev => ({ ...prev, body: e.target.value }))}
+                    onChange={(e) => setFormData(prev => ({...prev, body: e.target.value}))}
                     rows={30}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm font-mono"
                     placeholder="# 제목&#10;## 부제목&#10;- 목록&#10;1. 번호 목록&#10;```&#10;코드 블록&#10;```"

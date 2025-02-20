@@ -1,15 +1,15 @@
-import { useState, useEffect } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createDiary, updateDiary, generateFeedback } from '../api/diary';
-import { Loader2, Send, X } from 'lucide-react';
-import { Diary } from '../types/diary';
+import {useEffect, useState} from 'react';
+import {useMutation, useQueryClient} from '@tanstack/react-query';
+import {createDiary, generateFeedback, updateDiary} from '../api/diary';
+import {Loader2, Send, X} from 'lucide-react';
+import {Diary} from '../types/diary';
 
 interface Props {
     initialDiary?: Diary | null;
     onSaved?: () => void;
 }
 
-export const DiaryEditor = ({ initialDiary, onSaved }: Props) => {
+export const DiaryEditor = ({initialDiary, onSaved}: Props) => {
     const [body, setBody] = useState('');
     const today = new Date(new Date().getTime() + (9 * 60 * 60 * 1000)).toISOString().split('T')[0];
     const [selectedDate, setSelectedDate] = useState(today);
@@ -19,7 +19,7 @@ export const DiaryEditor = ({ initialDiary, onSaved }: Props) => {
     const feedbackMutation = useMutation({
         mutationFn: generateFeedback,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['diaries'] });
+            queryClient.invalidateQueries({queryKey: ['diaries']});
         }
     });
 
@@ -35,7 +35,7 @@ export const DiaryEditor = ({ initialDiary, onSaved }: Props) => {
     const createMutation = useMutation({
         mutationFn: createDiary,
         onSuccess: async (data) => {
-            queryClient.invalidateQueries({ queryKey: ['diaries'] });
+            queryClient.invalidateQueries({queryKey: ['diaries']});
             // 새 일기 작성 후 자동으로 피드백 생성
             await feedbackMutation.mutateAsync(data.diary_id);
             setBody('');
@@ -44,14 +44,14 @@ export const DiaryEditor = ({ initialDiary, onSaved }: Props) => {
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, data }: { id: number; data: { body: string; date?: string | null } }) => {
-            console.log('Updating diary with:', { id, data });
+        mutationFn: ({id, data}: { id: number; data: { body: string; date?: string | null } }) => {
+            console.log('Updating diary with:', {id, data});
             return updateDiary(id, data);
         },
         onSuccess: async (data) => {
-            queryClient.invalidateQueries({ queryKey: ['diaries'] });
+            queryClient.invalidateQueries({queryKey: ['diaries']});
             if (initialDiary) {
-                queryClient.invalidateQueries({ queryKey: ['diary', initialDiary.date] });
+                queryClient.invalidateQueries({queryKey: ['diary', initialDiary.date]});
             }
             // 일기 수정 후 자동으로 피드백 생성
             await feedbackMutation.mutateAsync(data.diary_id);
@@ -99,7 +99,7 @@ export const DiaryEditor = ({ initialDiary, onSaved }: Props) => {
                             onClick={handleCancel}
                             className="p-1 text-gray-400 hover:text-gray-600"
                         >
-                            <X className="h-5 w-5" />
+                            <X className="h-5 w-5"/>
                         </button>
                     )}
                 </div>
@@ -155,12 +155,12 @@ export const DiaryEditor = ({ initialDiary, onSaved }: Props) => {
                     >
                         {createMutation.isPending || updateMutation.isPending ? (
                             <>
-                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin"/>
                                 Saving...
                             </>
                         ) : (
                             <>
-                                <Send className="w-4 h-4 mr-2" />
+                                <Send className="w-4 h-4 mr-2"/>
                                 {initialDiary ? 'Update' : 'Save'} Diary
                             </>
                         )}

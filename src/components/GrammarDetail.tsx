@@ -1,6 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
-import { getGrammar } from '../api/grammar';
-import { Play } from 'lucide-react';
+import {useQuery} from '@tanstack/react-query';
+import {getGrammar} from '../api/grammar';
+import {Play} from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -9,8 +9,8 @@ interface Props {
     onClose: () => void;
 }
 
-export const GrammarDetail = ({ grammarId, onClose }: Props) => {
-    const { data: grammar, isLoading } = useQuery({
+export const GrammarDetail = ({grammarId, onClose}: Props) => {
+    const {data: grammar, isLoading} = useQuery({
         queryKey: ['grammar', grammarId],
         queryFn: () => getGrammar(grammarId)
     });
@@ -50,7 +50,8 @@ export const GrammarDetail = ({ grammarId, onClose }: Props) => {
                     >
                         <span className="sr-only">닫기</span>
                         <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                  d="M6 18L18 6M6 6l12 12"/>
                         </svg>
                     </button>
                 </div>
@@ -67,9 +68,10 @@ export const GrammarDetail = ({ grammarId, onClose }: Props) => {
                                     className="absolute top-0 left-0 w-full h-full"
                                 ></iframe>
                             ) : (
-                                <div className="absolute top-0 left-0 w-full h-full bg-gray-100 flex items-center justify-center">
+                                <div
+                                    className="absolute top-0 left-0 w-full h-full bg-gray-100 flex items-center justify-center">
                                     <div className="text-center text-gray-500">
-                                        <Play className="h-12 w-12 mx-auto mb-2" />
+                                        <Play className="h-12 w-12 mx-auto mb-2"/>
                                         <p>동영상을 불러올 수 없습니다</p>
                                     </div>
                                 </div>

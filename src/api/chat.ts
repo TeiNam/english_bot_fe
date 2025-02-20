@@ -1,11 +1,6 @@
 import axiosClient from './axiosClient';
-import { useAuthStore } from '../store/authStore';
-import {
-    ConversationListResponse,
-    ConversationHistory,
-    ChatMessage,
-    ChatSettings
-} from '../types/chat';
+import {useAuthStore} from '../store/authStore';
+import {ChatMessage, ChatSettings, ConversationHistory, ConversationListResponse} from '../types/chat';
 
 export const getConversations = async (): Promise<ConversationListResponse[]> => {
     try {
@@ -41,13 +36,13 @@ export const getChatHistory = async (conversationId: string): Promise<Conversati
 
 export const deleteConversation = async (conversationId: string): Promise<{ success: boolean }> => {
     try {
-        const { data } = await axiosClient.delete(`/chat/conversations/${conversationId}`);
+        const {data} = await axiosClient.delete(`/chat/conversations/${conversationId}`);
         return data;
     } catch (error: any) {
         console.error('Failed to delete conversation:', error);
         // 404는 이미 삭제된 것으로 간주
         if (error.response?.status === 404) {
-            return { success: true };
+            return {success: true};
         }
         throw new Error(
             error.response?.data?.detail ||

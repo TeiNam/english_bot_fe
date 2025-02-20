@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { Sparkles, Loader2 } from 'lucide-react';
+import {useState} from 'react';
+import {useMutation} from '@tanstack/react-query';
+import {Loader2, Sparkles} from 'lucide-react';
 
 export const DiaryFeedback = () => {
     const [selectedDiary, setSelectedDiary] = useState<string | null>(null);
@@ -37,12 +37,12 @@ export const DiaryFeedback = () => {
                 >
                     {analysisMutation.isPending ? (
                         <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin"/>
                             Analyzing...
                         </>
                     ) : (
                         <>
-                            <Sparkles className="w-4 h-4 mr-2" />
+                            <Sparkles className="w-4 h-4 mr-2"/>
                             Analyze with AI
                         </>
                     )}

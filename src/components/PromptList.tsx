@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getPrompts, deletePrompt } from '../api/prompt';
-import { ManagePromptForm } from './ManagePromptForm';
-import { Plus, Edit2, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
-import { Prompt } from '../types/prompt';
+import {useState} from 'react';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {deletePrompt, getPrompts} from '../api/prompt';
+import {ManagePromptForm} from './ManagePromptForm';
+import {ChevronDown, ChevronUp, Edit2, Plus, Trash2} from 'lucide-react';
+import {Prompt} from '../types/prompt';
 
 export const PromptList = () => {
     const [isFormOpen, setIsFormOpen] = useState(false);
@@ -11,7 +11,7 @@ export const PromptList = () => {
     const [expandedPromptId, setExpandedPromptId] = useState<number | null>(null);
     const queryClient = useQueryClient();
 
-    const { data: prompts, isLoading } = useQuery({
+    const {data: prompts, isLoading} = useQuery({
         queryKey: ['prompts'],
         queryFn: () => getPrompts()
     });
@@ -20,7 +20,7 @@ export const PromptList = () => {
         mutationFn: deletePrompt,
         onSuccess: () => {
             setExpandedPromptId(null);
-            queryClient.invalidateQueries({ queryKey: ['prompts'] });
+            queryClient.invalidateQueries({queryKey: ['prompts']});
         }
     });
 
@@ -58,7 +58,7 @@ export const PromptList = () => {
                     }}
                     className="flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
                 >
-                    <Plus className="h-4 w-4 mr-2" />
+                    <Plus className="h-4 w-4 mr-2"/>
                     새 프롬프트
                 </button>
             </div>
@@ -70,9 +70,9 @@ export const PromptList = () => {
                             <div className="flex justify-between items-center">
                                 <div className="flex items-center space-x-3">
                                     {expandedPromptId === prompt.prompt_template_id ? (
-                                        <ChevronUp className="h-5 w-5 text-gray-400" />
+                                        <ChevronUp className="h-5 w-5 text-gray-400"/>
                                     ) : (
-                                        <ChevronDown className="h-5 w-5 text-gray-400" />
+                                        <ChevronDown className="h-5 w-5 text-gray-400"/>
                                     )}
                                     <div>
                                         <h3 className="text-lg font-medium text-gray-900">
@@ -86,11 +86,12 @@ export const PromptList = () => {
                                     </div>
                                 </div>
                                 <div className="flex items-center space-x-4">
-                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                        prompt.is_active === 'Y'
-                                            ? 'bg-green-100 text-green-800'
-                                            : 'bg-red-100 text-red-800'
-                                    }`}>
+                                    <span
+                                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                            prompt.is_active === 'Y'
+                                                ? 'bg-green-100 text-green-800'
+                                                : 'bg-red-100 text-red-800'
+                                        }`}>
                                         {prompt.is_active === 'Y' ? '활성화' : '비활성화'}
                                     </span>
                                     <button
@@ -100,7 +101,7 @@ export const PromptList = () => {
                                         }}
                                         className="p-2 text-gray-400 hover:text-gray-600"
                                     >
-                                        <Edit2 className="h-4 w-4" />
+                                        <Edit2 className="h-4 w-4"/>
                                     </button>
                                     <button
                                         onClick={(e) => {
@@ -111,7 +112,7 @@ export const PromptList = () => {
                                         }}
                                         className="p-2 text-gray-400 hover:text-red-500"
                                     >
-                                        <Trash2 className="h-4 w-4" />
+                                        <Trash2 className="h-4 w-4"/>
                                     </button>
                                 </div>
                             </div>
@@ -120,13 +121,15 @@ export const PromptList = () => {
                             <div className="mt-4 space-y-4">
                                 <div>
                                     <h4 className="text-sm font-medium text-gray-700">시스템 프롬프트:</h4>
-                                    <pre className="text-sm text-gray-600 font-mono whitespace-pre-wrap bg-gray-50 p-2 rounded mt-1">
+                                    <pre
+                                        className="text-sm text-gray-600 font-mono whitespace-pre-wrap bg-gray-50 p-2 rounded mt-1">
                                         {prompt.system_prompt}
                                     </pre>
                                 </div>
                                 <div>
                                     <h4 className="text-sm font-medium text-gray-700">사용자 프롬프트:</h4>
-                                    <pre className="text-sm text-gray-600 font-mono whitespace-pre-wrap bg-gray-50 p-2 rounded mt-1">
+                                    <pre
+                                        className="text-sm text-gray-600 font-mono whitespace-pre-wrap bg-gray-50 p-2 rounded mt-1">
                                         {prompt.user_prompt}
                                     </pre>
                                 </div>
