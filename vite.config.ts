@@ -8,10 +8,6 @@ export default defineConfig({
     server: {
         host: true,
         port: 5173,
-        https: {
-            key: fs.readFileSync('./.cert/key.pem'),
-            cert: fs.readFileSync('./.cert/cert.pem'),
-        },
         watch: {
             usePolling: true
         }
