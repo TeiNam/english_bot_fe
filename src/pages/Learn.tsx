@@ -17,16 +17,37 @@ export const Learn = () => {
     const [editingAnswer, setEditingAnswer] = useState<Answer | null>(null);
 
     // SmallTalk Queries
-    const { data: selectedTalk } = useQuery({
+    const { data: selectedTalk, isLoading: isSmallTalkLoading, error: smallTalkError } = useQuery({
         queryKey: ['smallTalk', selectedTalkId],
-        queryFn: () => selectedTalkId ? getSmallTalk(selectedTalkId) : null,
+        queryFn: async () => {
+            console.log('Fetching small talk details:', selectedTalkId);
+            if (!selectedTalkId) return null;
+
+            // 스몰톡 데이터 가져오기
+            const smallTalk = await getSmallTalk(selectedTalkId);
+
+            // 답변 데이터 가져오기
+            try {
+                const answers = await getAnswers(selectedTalkId);
+                return {
+                    ...smallTalk,
+                    answers: answers || []
+                };
+            } catch (error) {
+                return {
+                    ...smallTalk,
+                    answers: []
+                };
+            }
+        },
         enabled: !!selectedTalkId
     });
 
-    const { data: answers } = useQuery({
+    const { data: answers = [], isLoading: isAnswersLoading } = useQuery({
         queryKey: ['answers', selectedTalkId],
         queryFn: () => selectedTalkId ? getAnswers(selectedTalkId) : [],
-        enabled: !!selectedTalkId
+        enabled: !!selectedTalkId,
+        retry: 1,
     });
 
     // Mutations
@@ -69,7 +90,6 @@ export const Learn = () => {
         }
     };
 
-    // Learn.tsx
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 px-4 md:px-6">
             {/* 첫 번째 컬럼 - 리스트 */}
@@ -97,7 +117,15 @@ export const Learn = () => {
             {/* 두 번째 컬럼 - 상세 */}
             <div className="w-full md:sticky md:top-6">
                 <div className="h-[20px] md:h-[52px]" />
-                {selectedTalkId && selectedTalk ? (
+                {isSmallTalkLoading ? (
+                    <div className="flex justify-center items-center h-64">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"></div>
+                    </div>
+                ) : smallTalkError ? (
+                    <div className="bg-red-50 rounded-lg p-4 md:p-6 text-center text-red-600">
+                        데이터를 불러오는데 실패했습니다.
+                    </div>
+                ) : selectedTalkId && selectedTalk ? (
                     <div className="bg-white rounded-lg shadow-lg">
                         <div className="p-4 md:p-6 border-b border-gray-200">
                             <div className="flex justify-between items-start mb-4">
@@ -127,7 +155,9 @@ export const Learn = () => {
                                     <div className="flex-shrink-0 bg-white rounded-full p-1 shadow-sm">
                                         <Info className="h-5 w-5 text-gray-400" />
                                     </div>
-                                    <pre className="whitespace-pre-wrap font-sans text-sm break-words flex-grow">{selectedTalk.parenthesis}</pre>
+                                    <pre className="whitespace-pre-wrap font-sans text-sm break-words flex-grow">
+                                        {selectedTalk.parenthesis}
+                                    </pre>
                                 </div>
                             )}
                         </div>
@@ -152,37 +182,47 @@ export const Learn = () => {
                             </div>
 
                             <div className="space-y-4">
-                                {answers?.map((answer) => (
-                                    <div
-                                        key={answer.answer_id}
-                                        className="border-l-4 border-indigo-200 pl-4 py-2"
-                                    >
-                                        <div className="flex justify-between items-start">
-                                            <div>
-                                                <p className="text-gray-900">{answer.eng_sentence}</p>
-                                                {answer.kor_sentence && (
-                                                    <p className="text-gray-600 text-sm mt-1">
-                                                        {answer.kor_sentence}
-                                                    </p>
-                                                )}
-                                            </div>
-                                            <div className="flex space-x-2">
-                                                <button
-                                                    onClick={() => handleEditAnswer(answer)}
-                                                    className="p-1 text-gray-400 hover:text-gray-500"
-                                                >
-                                                    <Edit2 className="h-4 w-4" />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDeleteAnswer(answer.answer_id)}
-                                                    className="p-1 text-gray-400 hover:text-red-500"
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </button>
+                                {isAnswersLoading ? (
+                                    <div className="text-center py-4">
+                                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-500 mx-auto"></div>
+                                    </div>
+                                ) : answers?.length > 0 ? (
+                                    answers.map((answer) => (
+                                        <div
+                                            key={answer.answer_id}
+                                            className="border-l-4 border-indigo-200 pl-4 py-2"
+                                        >
+                                            <div className="flex justify-between items-start">
+                                                <div>
+                                                    <p className="text-gray-900">{answer.eng_sentence}</p>
+                                                    {answer.kor_sentence && (
+                                                        <p className="text-gray-600 text-sm mt-1">
+                                                            {answer.kor_sentence}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                                <div className="flex space-x-2">
+                                                    <button
+                                                        onClick={() => handleEditAnswer(answer)}
+                                                        className="p-1 text-gray-400 hover:text-gray-500"
+                                                    >
+                                                        <Edit2 className="h-4 w-4" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteAnswer(answer.answer_id)}
+                                                        className="p-1 text-gray-400 hover:text-red-500"
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
+                                    ))
+                                ) : (
+                                    <div className="text-center text-gray-500 py-4">
+                                        등록된 답변이 없습니다
                                     </div>
-                                ))}
+                                )}
                             </div>
                         </div>
                     </div>

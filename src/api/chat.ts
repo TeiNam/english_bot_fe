@@ -1,32 +1,15 @@
-// api/chat.ts
-import axios from 'axios';
-import { config } from '../config';
+import axiosClient from './axiosClient';
 import { useAuthStore } from '../store/authStore';
 import {
     ConversationListResponse,
     ConversationHistory,
-    ChatMessage
+    ChatMessage,
+    ChatSettings
 } from '../types/chat';
-
-const API_URL = config.apiUrl;
-
-// API 요청에 공통으로 사용할 설정
-const getAuthHeaders = () => {
-    const token = useAuthStore.getState().token;
-    return {
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        }
-    };
-};
 
 export const getConversations = async (): Promise<ConversationListResponse[]> => {
     try {
-        const response = await axios.get(
-            `${API_URL}/api/v1/chat/conversations`,
-            getAuthHeaders()
-        );
+        const response = await axiosClient.get('/chat/conversations');
         return response.data;
     } catch (error: any) {
         console.error('Failed to fetch conversations:', error);
@@ -42,10 +25,7 @@ export const getConversations = async (): Promise<ConversationListResponse[]> =>
 
 export const getChatHistory = async (conversationId: string): Promise<ConversationHistory[]> => {
     try {
-        const response = await axios.get(
-            `${API_URL}/api/v1/chat/history/${conversationId}`,
-            getAuthHeaders()
-        );
+        const response = await axiosClient.get(`/chat/history/${conversationId}`);
         return response.data;
     } catch (error: any) {
         console.error('Failed to fetch chat history:', error);
@@ -61,10 +41,7 @@ export const getChatHistory = async (conversationId: string): Promise<Conversati
 
 export const deleteConversation = async (conversationId: string): Promise<{ success: boolean }> => {
     try {
-        const { data } = await axios.delete(
-            `${API_URL}/api/v1/chat/conversations/${conversationId}`,
-            getAuthHeaders()
-        );
+        const { data } = await axiosClient.delete(`/chat/conversations/${conversationId}`);
         return data;
     } catch (error: any) {
         console.error('Failed to delete conversation:', error);
@@ -81,12 +58,13 @@ export const deleteConversation = async (conversationId: string): Promise<{ succ
 
 export const streamChat = async (data: ChatMessage): Promise<Response> => {
     const token = useAuthStore.getState().token;
+    const baseUrl = axiosClient.getUri();
     try {
-        const response = await fetch(`${API_URL}/api/v1/chat/stream`, {
+        const response = await fetch(`${baseUrl}/chat/stream`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+                Authorization: `Bearer ${token}`
             },
             body: JSON.stringify(data)
         });
@@ -122,17 +100,11 @@ export const streamChat = async (data: ChatMessage): Promise<Response> => {
 };
 
 export const getChatSettings = async (): Promise<ChatSettings> => {
-    const token = useAuthStore.getState().token;
-    const response = await axios.get<ChatSettings>(`${API_URL}/api/v1/chat/settings`, {
-        headers: { Authorization: `Bearer ${token}` }
-    });
+    const response = await axiosClient.get<ChatSettings>('/chat/settings');
     return response.data;
 };
 
 export const updateChatSettings = async (settings: Partial<ChatSettings>): Promise<ChatSettings> => {
-    const token = useAuthStore.getState().token;
-    const response = await axios.put<ChatSettings>(`${API_URL}/api/v1/chat/settings`, settings, {
-        headers: { Authorization: `Bearer ${token}` }
-    });
+    const response = await axiosClient.put<ChatSettings>('/chat/settings', settings);
     return response.data;
 };

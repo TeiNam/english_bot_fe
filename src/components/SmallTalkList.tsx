@@ -10,18 +10,6 @@ interface Props {
     pageSize?: number; // Add optional pageSize prop
 }
 
-interface SmallTalk {
-    talk_id: number;
-    eng_sentence: string;
-    create_at: string | null;
-    tag: string | null;
-}
-
-interface SmallTalkResponse {
-    items: SmallTalk[];
-    total_pages: number;
-}
-
 export const SmallTalkList = ({ onSelectTalk, selectedTalkId, pageSize = 10 }: Props) => {
     const [currentPage, setCurrentPage] = useState<number>(1);
 
@@ -36,17 +24,22 @@ export const SmallTalkList = ({ onSelectTalk, selectedTalkId, pageSize = 10 }: P
     const answerCounts = useQuery({
         queryKey: ['answerCounts', data?.items?.map(talk => talk.talk_id)],
         queryFn: async () => {
-            if (!data?.items) return {};
-            const counts = await Promise.all(
-                data.items.map(async talk => ({
-                    talkId: talk.talk_id,
-                    count: await getAnswerCount(talk.talk_id)
-                }))
+            if (!data?.items?.length) return {};
+
+            const results = await Promise.allSettled(
+                data.items.map(talk => getAnswerCount(talk.talk_id))
             );
-            return Object.fromEntries(counts.map(({ talkId, count }) => [talkId, count]));
+
+            return data.items.reduce((acc, talk, index) => {
+                const result = results[index];
+                acc[talk.talk_id] = result.status === 'fulfilled' ? result.value : 0;
+                return acc;
+            }, {} as Record<number, number>);
         },
         enabled: !!data?.items,
-        staleTime: 1000 * 60 * 5, // 5분
+        staleTime: 1000 * 60 * 5,
+        retry: 1,
+        refetchOnWindowFocus: false
     });
 
     // 로딩 상태 최적화

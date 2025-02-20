@@ -4,8 +4,11 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 interface AuthState {
     token: string | null;
     user: any | null;
-    setAuth: (token: string, user: any) => void;
+    tokenExpiry: number | null;
+    setAuth: (token: string, user: any, expiry: number) => void;
     logout: () => void;
+    isAuthenticated: () => boolean;
+    getToken: () => string | null;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -13,22 +16,34 @@ export const useAuthStore = create<AuthState>()(
         (set) => ({
             token: null,
             user: null,
-            setAuth: (token, user) => {
-                set({ token, user });
-                localStorage.setItem('auth_token', token);
+            tokenExpiry: null,
+            setAuth: (token, user, tokenExpiry) => {
+                set({ token, user, tokenExpiry });
             },
             logout: () => {
-                set({ token: null, user: null });
-                localStorage.removeItem('auth_token');
+                set({ token: null, user: null, tokenExpiry: null });
                 sessionStorage.clear();
+                window.location.href = '/login';
             },
+            isAuthenticated: () => {
+                const state = get();
+                return !!(state.token && state.tokenExpiry && Date.now() < state.tokenExpiry);
+            },
+            getToken: () => {
+                const state = get();
+                if (state.token && state.tokenExpiry && Date.now() < state.tokenExpiry) {
+                    return state.token;
+                }
+                return null;
+            }
         }),
         {
             name: 'auth-storage',
             storage: createJSONStorage(() => localStorage),
             partialize: (state: AuthState) => ({
                 user: state.user,
-                token: state.token
+                token: state.token,
+                tokenExpiry: state.tokenExpiry
             })
         }
     )

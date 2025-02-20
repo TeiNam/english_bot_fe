@@ -16,15 +16,17 @@ export const LoginForm = () => {
     setError('');
 
     try {
-      await login({ email, password });
+      const response = await login({ email, password });
+      if (!response.access_token) {
+        throw new Error('로그인에 실패했습니다.');
+      }
 
       // 약간의 지연 후 네비게이션 실행
       setTimeout(() => {
         navigate('/Practice', { replace: true });
       }, 100);
     } catch (err) {
-      console.error('Login error:', err); // 디버깅용 로그
-      setError('Invalid email or password');
+      setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
     } finally {
       setIsLoading(false);
     }

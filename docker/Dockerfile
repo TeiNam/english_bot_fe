@@ -27,8 +27,8 @@ RUN npm run build
 # Install serve globally
 RUN npm install -g serve
 
-# Expose port 5173
+# Expose port
 EXPOSE 5173
 
 # Start serve with updated options
-CMD ["serve", "-s", "dist", "-l", "5173", "--no-hrm"]
+CMD ["serve", "-s", "dist", "-l", "5173", "--single"]

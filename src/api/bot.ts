@@ -1,8 +1,4 @@
-import axios from 'axios';
-import { config } from '../config';
-import { useAuthStore } from '../store/authStore';
-
-const API_URL = config.apiUrl;
+import axiosClient from './axiosClient';
 
 export interface BotStatus {
     is_running: boolean;
@@ -15,33 +11,21 @@ export interface BotStatus {
 }
 
 export const getBotStatus = async (): Promise<BotStatus> => {
-    const token = useAuthStore.getState().token;
-    const response = await axios.get(`${API_URL}/api/v1/bot/bot-status`, {
-        headers: { Authorization: `Bearer ${token}` }
-    });
+    const response = await axiosClient.get('/bot/bot-status');
     return response.data;
 };
 
 export const startBot = async () => {
-    const token = useAuthStore.getState().token;
-    const response = await axios.post(`${API_URL}/api/v1/bot/start`, null, {
-        headers: { Authorization: `Bearer ${token}` }
-    });
+    const response = await axiosClient.post('/bot/start');
     return response.data;
 };
 
 export const stopBot = async () => {
-    const token = useAuthStore.getState().token;
-    const response = await axios.post(`${API_URL}/api/v1/bot/stop`, null, {
-        headers: { Authorization: `Bearer ${token}` }
-    });
+    const response = await axiosClient.post('/bot/stop');
     return response.data;
 };
 
 export const sendMessageNow = async () => {
-    const token = useAuthStore.getState().token;
-    const response = await axios.post(`${API_URL}/api/v1/bot/send-now`, null, {
-        headers: { Authorization: `Bearer ${token}` }
-    });
+    const response = await axiosClient.post('/bot/send-now');
     return response.data;
 };

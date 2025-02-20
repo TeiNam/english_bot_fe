@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Send, Plus, Trash2, ArrowLeft, Loader2 } from 'lucide-react';
 import { ConversationHistory, ConversationListResponse } from '../types/chat';
 import { ChatSettings } from '../components/ChatSettings';
+import { ChatMessages } from '../components/ChatMessages';
 import {
     getConversations,
     getChatHistory,
@@ -288,28 +289,7 @@ export const Chat = () => {
                 {/* Message list */}
                 <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-3 md:space-y-4 min-h-0 bg-gray-50 pb-[200px] md:pb-[220px]">
                     {/* Existing chat history */}
-                    {chatHistory?.map((msg: ConversationHistory) => (
-                        <div key={msg.chat_history_id} className="space-y-3">
-                            <div className="flex flex-col space-y-3">
-                                <div className="flex justify-end">
-                                    <div className="bg-indigo-100 rounded-2xl px-3 md:px-4 py-2 max-w-[90%] md:max-w-[85%]">
-                                        <p className="text-gray-900 whitespace-pre-wrap">
-                                            {msg.user_message}
-                                        </p>
-                                    </div>
-                                </div>
-                                {msg.bot_response && (
-                                    <div className="flex justify-start">
-                                        <div className="bg-white rounded-2xl px-3 md:px-4 py-2 max-w-[90%] md:max-w-[85%] shadow-sm">
-                                            <p className="text-gray-900 whitespace-pre-wrap">
-                                                {msg.bot_response}
-                                            </p>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    ))}
+                    {chatHistory && <ChatMessages messages={chatHistory} />}
 
                     {/* Local messages with typing effect */}
                     {localMessages.map((msg: ConversationHistory) => (

@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import fs from 'fs';
 import type { PreRenderedAsset } from 'rollup';
 
 export default defineConfig({
@@ -7,6 +8,10 @@ export default defineConfig({
     server: {
         host: true,
         port: 5173,
+        https: {
+            key: fs.readFileSync('./.cert/key.pem'),
+            cert: fs.readFileSync('./.cert/cert.pem'),
+        },
         watch: {
             usePolling: true
         }

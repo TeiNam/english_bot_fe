@@ -32,3 +32,4 @@ build
 *.log
 *.swp
 *.bak
+*.tar
