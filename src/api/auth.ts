@@ -1,22 +1,16 @@
 // src/api/auth.ts
 import axios from 'axios';
+import axiosClient from './axiosClient';
 import { AuthResponse, LoginCredentials } from '../types/auth';
-import { config } from '../config';
 import { useAuthStore } from '../store/authStore';
 
 export const login = async (credentials: LoginCredentials): Promise<AuthResponse> => {
     try {
-        const response = await axios.post<AuthResponse>(
-            `${config.apiUrl}/api/v1/auth/login`,
+        const response = await axiosClient.post<AuthResponse>(
+            '/auth/login',
             {
                 email: credentials.email,
                 password: credentials.password
-            },
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                }
             }
         );
 

@@ -12,10 +12,8 @@ export const getSmallTalks = async (page: number = 1, size: number = 10): Promis
 };
 
 export const getSmallTalk = async (talkId: number): Promise<SmallTalk> => {
-    console.log('Fetching small talk for ID:', talkId);
     try {
         const response = await axiosClient.get<SmallTalk>(`/small-talk/${talkId}`);
-        console.log('SmallTalk API response:', response.data);
 
         if (!response.data) {
             throw new Error('Invalid API response format');
@@ -23,7 +21,7 @@ export const getSmallTalk = async (talkId: number): Promise<SmallTalk> => {
 
         return response.data;
     } catch (error) {
-        console.error('Error fetching small talk:', error);
+        console.error('Failed to fetch small talk:', error);
         throw error;
     }
 };

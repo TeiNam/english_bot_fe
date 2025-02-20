@@ -211,11 +211,10 @@ export const Chat = () => {
 
     return (
         // 전체 그리드 컨테이너의 높이를 줄여서 입력 영역이 보이도록 수정 (h-[calc(100vh-8rem)])
-        <div
-            className="grid grid-cols-1 md:grid-cols-4 gap-4 h-[calc(100vh-4rem)] md:h-[calc(100vh-8rem)] bg-white safe-area-inset-bottom">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 h-[calc(100vh-4rem)] bg-white">
             {/* Sidebar */}
             <div
-                className="hidden md:flex flex-col bg-white p-3 md:p-4 border-r border-gray-200 overflow-y-auto h-full">
+                className="hidden md:flex flex-col bg-white p-3 md:p-4 border-r border-gray-200 overflow-y-auto">
                 <div className="flex space-x-2 mb-4">
                     <ChatSettings/>
                     <button
@@ -265,9 +264,10 @@ export const Chat = () => {
             </div>
 
             {/* Main chat area */}
-            <div className="col-span-1 md:col-span-3 flex flex-col bg-white h-full relative">
+            <div className="col-span-1 md:col-span-3 flex flex-col bg-white h-[calc(100vh-4rem)] relative">
                 {/* Header */}
-                <div className="flex items-center justify-between p-2 md:p-3 border-b border-gray-200 bg-white">
+                <div
+                    className="flex items-center justify-between p-2 md:p-3 border-b border-gray-200 bg-white sticky top-0 z-10">
                     <div className="flex items-center space-x-4">
                         <button onClick={() => navigate('/chat')} className="md:hidden p-2">
                             <ArrowLeft className="h-4 w-4 text-gray-500"/>
@@ -284,8 +284,7 @@ export const Chat = () => {
                 </div>
 
                 {/* Message list */}
-                <div
-                    className="flex-1 overflow-y-auto p-3 md:p-4 space-y-3 md:space-y-4 min-h-0 bg-gray-50 pb-[200px] md:pb-[220px]">
+                <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-3 md:space-y-4 bg-gray-50">
                     {/* Existing chat history */}
                     {chatHistory && <ChatMessages messages={chatHistory}/>}
 
@@ -342,7 +341,7 @@ export const Chat = () => {
                 )}
 
                 {/* Input area */}
-                <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+                <div className="sticky bottom-0 left-0 right-0 bg-white border-t border-gray-200 mt-auto">
                     {error && <div className="text-red-500 mb-2">{error}</div>}
                     <div className="p-2 md:p-3">
                         <div className="flex space-x-4 mb-3">

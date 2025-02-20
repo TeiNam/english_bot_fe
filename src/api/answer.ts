@@ -38,12 +38,25 @@ export const getAnswerCounts = async (talkIds: number[]): Promise<Record<number,
 
 export const createAnswer = async (data: Partial<Answer>): Promise<Answer> => {
     try {
-        console.log('Creating answer with data:', data);
+        const baseUrl = axiosClient.getUri();
+        console.log('Answer API - Base URL:', baseUrl);
+        console.log('Answer API - Request data:', data);
+
         const response = await axiosClient.post<Answer>('/answers', data);
-        console.log('Create answer response:', response.data);
+        console.log('Answer API - Response:', {
+            status: response.status,
+            headers: response.headers,
+            data: response.data
+        });
+
         return response.data;
     } catch (error) {
-        console.error('Failed to create answer:', error);
+        console.error('Answer API - Error details:', {
+            error,
+            config: error.config,
+            response: error.response,
+            message: error.message
+        });
         throw error;
     }
 };

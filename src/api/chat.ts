@@ -55,7 +55,7 @@ export const streamChat = async (data: ChatMessage): Promise<Response> => {
     const token = useAuthStore.getState().token;
     const baseUrl = axiosClient.getUri();
     try {
-        const response = await fetch(`${baseUrl}/api/v1/chat/stream`, {
+        const response = await fetch(`${baseUrl}/chat/stream`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
