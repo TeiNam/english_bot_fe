@@ -6,17 +6,27 @@ import {getPrompts} from '../api/prompt';
 
 export const ChatSettings = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const [temperatureValue, setTemperatureValue] = useState<number>(0.7);
     const queryClient = useQueryClient();
 
     const {data: settings, isLoading: isSettingsLoading} = useQuery({
         queryKey: ['chatSettings'],
-        queryFn: getChatSettings
+        queryFn: getChatSettings,
+        onSuccess: (data) => {
+            // 초기 temperature 값 설정
+            if (data?.temperature) {
+                setTemperatureValue(data.temperature);
+            }
+        }
     });
 
     const {data: prompts, isLoading: isPromptsLoading} = useQuery({
         queryKey: ['prompts'],
         queryFn: getPrompts
     });
+
+    // 활성화된 프롬프트만 필터링
+    const activePrompts = prompts?.filter(prompt => prompt.is_active === 'Y') || [];
 
     const updateMutation = useMutation({
         mutationFn: updateChatSettings,
@@ -32,10 +42,15 @@ export const ChatSettings = () => {
         const newSettings = {
             default_prompt_template_id: Number(formData.get('default_prompt_template_id')),
             model: formData.get('model') as string,
-            temperature: Number(formData.get('temperature')),
+            temperature: temperatureValue, // 상태값 사용
             max_tokens: Number(formData.get('max_tokens'))
         };
         updateMutation.mutate(newSettings);
+    };
+
+    // 온체인지 핸들러 추가
+    const handleTemperatureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setTemperatureValue(parseFloat(e.target.value));
     };
 
     if (isSettingsLoading || isPromptsLoading) return null;
@@ -73,7 +88,7 @@ export const ChatSettings = () => {
                                     defaultValue={settings?.default_prompt_template_id}
                                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                 >
-                                    {prompts?.map((prompt) => (
+                                    {activePrompts.map((prompt) => (
                                         <option key={prompt.prompt_template_id} value={prompt.prompt_template_id}>
                                             {prompt.name}
                                         </option>
@@ -105,11 +120,12 @@ export const ChatSettings = () => {
                                     min="0"
                                     max="2"
                                     step="0.1"
-                                    defaultValue={settings?.temperature}
+                                    value={temperatureValue}
+                                    onChange={handleTemperatureChange}
                                     className="mt-1 block w-full"
                                 />
                                 <div className="text-sm text-gray-500 mt-1">
-                                    현재 값: {settings?.temperature}
+                                    현재 값: {temperatureValue.toFixed(1)}
                                 </div>
                             </div>
 
