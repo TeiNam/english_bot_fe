@@ -17,18 +17,14 @@ RUN npm ci --legacy-peer-deps
 
 # Copy source code and serve config
 COPY . .
-COPY serve.json /app/dist/
 
 # Build the application
 ARG VITE_API_URL
 ENV VITE_API_URL=${VITE_API_URL}
 RUN npm run build
 
-# Install serve globally
-RUN npm install -g serve
-
 # Expose port
 EXPOSE 5173
 
 # Start serve with updated options
-CMD ["serve", "-s", "dist", "-l", "5173", "--single"]
+CMD ["npm", "run", "preview", "--", "--host", "--port", "5173"]
