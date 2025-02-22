@@ -1,6 +1,7 @@
 import {Link, Navigate, Outlet, useLocation} from 'react-router-dom';
 import {useAuthStore} from '../store/authStore';
 import {Github, LogOut} from 'lucide-react';
+import {wordpress} from '@wordpress/icons';
 
 export const Layout = () => {
     const {pathname} = useLocation();
@@ -102,7 +103,7 @@ export const Layout = () => {
                         <div className="flex items-center">
                             <button
                                 onClick={() => logout()}
-                                className="flex items-center text-gray-500 hover:text-gray-700 ml-8"
+                                className="flex items-center text-gray-500 hover:text-gray-700 ml-4"
                             >
                                 <LogOut className="h-5 w-5 mr-1"/>
                                 Logout
@@ -112,7 +113,7 @@ export const Layout = () => {
                 </div>
             </nav>
 
-            <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <main className="max-w-7xl w-full mx-auto py-6 px-4 sm:px-6 lg:px-8">
                 <Outlet/>
             </main>
 

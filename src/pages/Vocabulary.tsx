@@ -40,22 +40,22 @@ export const Vocabulary = () => {
     };
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 px-4 md:px-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             <div className="w-full mb-4 md:mb-0">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
                     <h1 className="text-xl md:text-2xl font-bold text-gray-900">Vocabulary</h1>
                     <div
                         className="flex flex-col md:flex-row items-stretch md:items-center w-full md:w-auto gap-2 md:gap-4">
                         <div className="relative flex-grow md:flex-grow-0">
+                            <Search
+                                className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none"/>
                             <input
                                 type="text"
                                 value={wordSearchQuery}
                                 onChange={(e) => setWordSearchQuery(e.target.value)}
-                                placeholder="단어 검색"
-                                className="w-full md:w-[250px] pl-10 pr-4 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                placeholder="Search"
+                                className="w-full md:w-[250px] pl-8 text-right pr-4 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
                             />
-                            <Search
-                                className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none"/>
                         </div>
                         <button
                             onClick={() => setIsAddMode(true)}

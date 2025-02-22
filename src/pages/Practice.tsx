@@ -61,7 +61,7 @@ export const Practice = () => {
     }
 
     return (
-        <div className="space-y-6 px-4 sm:px-0">
+        <div className="space-y-6">
             <div className="h-[32px] flex items-center">
                 <h1 className="text-2xl font-bold text-gray-900">Practice</h1>
             </div>

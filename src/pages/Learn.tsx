@@ -91,7 +91,7 @@ export const Learn = () => {
     };
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 px-4 md:px-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             {/* 첫 번째 컬럼 - 리스트 */}
             <div className="w-full mb-4 md:mb-0">
                 <div className="h-[32px] flex justify-between items-center mb-4">
