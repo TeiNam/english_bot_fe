@@ -58,7 +58,7 @@ export const Chat = () => {
     const simulateNaturalTyping = async (text: string) => {
         setTypedMessage(''); // 기존 텍스트 초기화
         const words = text.split(' ');
-        for (let word of words) {
+        for (const word of words) {
             setTypedMessage(prev => (prev ? prev + ' ' + word : word));
             // 기본 딜레이: 20~40ms 랜덤, 구두점이 있으면 추가 딜레이
             let delay = Math.floor(Math.random() * 20) + 20;

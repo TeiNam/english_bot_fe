@@ -139,9 +139,12 @@ const errorHandler = async (error: any): Promise<any> => {
     };
 
     const originalRequest = error.config;
+    const isTokenExpiredError = error.response?.status === 401 &&
+        (error.response?.data?.detail?.includes('expired') ||
+            error.response?.data?.detail?.includes('invalid'));
 
-    // 401 에러 및 토큰 갱신 처리
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // 토큰 만료 에러 처리
+    if (isTokenExpiredError && !originalRequest._retry) {
         if (isRefreshing) {
             return new Promise((resolve, reject) => {
                 failedQueue.push({resolve, reject});
@@ -167,6 +170,12 @@ const errorHandler = async (error: any): Promise<any> => {
         } finally {
             isRefreshing = false;
         }
+    }
+
+    // 토큰 갱신 실패 또는 다른 401 에러의 경우 로그아웃 처리
+    if (error.response?.status === 401) {
+        useAuthStore.getState().logout();
+        return Promise.reject(new Error('세션이 만료되었습니다. 다시 로그인해주세요.'));
     }
 
     // 나머지 에러 처리 로직은 그대로 유지

@@ -23,17 +23,24 @@ export const useAuthStore = create<AuthState>()(
             logout: () => {
                 set({token: null, user: null, tokenExpiry: null});
                 sessionStorage.clear();
+                localStorage.removeItem('auth-storage');
                 window.location.href = '/login';
             },
             isAuthenticated: () => {
                 const state = get();  // 이제 get() 사용 가능
-                return !!(state.token && state.tokenExpiry && Date.now() < state.tokenExpiry);
+                if (!state.token || !state.tokenExpiry) return false;
+                if (Date.now() >= state.tokenExpiry) {
+                    get().logout();
+                    return false;
+                }
+                return true;
             },
             getToken: () => {
                 const state = get();  // 이제 get() 사용 가능
                 if (state.token && state.tokenExpiry && Date.now() < state.tokenExpiry) {
                     return state.token;
                 }
+                get().logout();
                 return null;
             }
         }),
