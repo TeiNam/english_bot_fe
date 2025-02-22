@@ -52,10 +52,10 @@ export const Vocabulary = () => {
                                 value={wordSearchQuery}
                                 onChange={(e) => setWordSearchQuery(e.target.value)}
                                 placeholder="단어 검색"
-                                className="w-full md:w-[250px] pl-8 pr-4 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                className="w-full md:w-[250px] pl-10 pr-4 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
                             />
                             <Search
-                                className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400"/>
+                                className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none"/>
                         </div>
                         <button
                             onClick={() => setIsAddMode(true)}
