@@ -1,19 +1,19 @@
-import {useState} from 'react';
-import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-import {Settings, X} from 'lucide-react';
-import {getChatSettings, updateChatSettings} from '../api/chat';
-import {getPrompts} from '../api/prompt';
+import { useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Settings, X } from 'lucide-react';
+import { getChatSettings, updateChatSettings } from '../api/chat';
+import { getPrompts } from '../api/prompt';
+import { ChatSettings as ChatSettingsType } from '../types/chat';
 
 export const ChatSettings = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [temperatureValue, setTemperatureValue] = useState<number>(0.7);
     const queryClient = useQueryClient();
 
-    const {data: settings, isLoading: isSettingsLoading} = useQuery({
+    const {data: settings, isLoading: isSettingsLoading} = useQuery<ChatSettingsType, Error>({
         queryKey: ['chatSettings'],
         queryFn: getChatSettings,
         onSuccess: (data) => {
-            // 초기 temperature 값 설정
             if (data?.temperature) {
                 setTemperatureValue(data.temperature);
             }

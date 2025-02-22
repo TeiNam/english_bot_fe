@@ -130,7 +130,8 @@ axiosClient.interceptors.request.use(
     }
 );
 
-const errorHandler = async (error: any): Promise<ApiError> => {
+// 반환 타입을 Promise<any>로 변경하여 다양한 반환 타입을 허용
+const errorHandler = async (error: any): Promise<any> => {
     const errorResponse: ApiError = {
         message: '알 수 없는 오류가 발생했습니다.',
         code: 'UNKNOWN_ERROR',
