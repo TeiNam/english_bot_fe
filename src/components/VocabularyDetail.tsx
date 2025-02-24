@@ -104,7 +104,30 @@ export const VocabularyDetail = ({vocabularyId, onClose}: Props) => {
     return (
         <div className="bg-white rounded-lg shadow-lg">
             <div className="p-6 border-b border-gray-200">
-                {/* 단어 제목 부분 */}
+                <div className="flex justify-between items-start mb-4">
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-900">{vocabulary.word}</h2>
+                        {(vocabulary.past_tense || vocabulary.past_participle) && (
+                            <div className="mt-2 text-sm text-gray-600">
+                                {vocabulary.past_tense && (
+                                    <span className="mr-4">과거형: {vocabulary.past_tense}</span>
+                                )}
+                                {vocabulary.past_participle && (
+                                    <span>과거분사: {vocabulary.past_participle}</span>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                    <button
+                        onClick={onClose}
+                        className="text-gray-400 hover:text-gray-500"
+                    >
+                        <span className="sr-only">닫기</span>
+                        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
 
             <div className="p-6">

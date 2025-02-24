@@ -5,40 +5,24 @@ import {ManageSmallTalkForm} from '../components/ManageSmallTalkForm';
 import {ManageAnswerForm} from '../components/ManageAnswerForm';
 import {deleteSmallTalk, getSmallTalk} from '../api/smallTalk';
 import {deleteAnswer, getAnswers} from '../api/answer';
-import {Edit2, Info, MessageCircle, Plus, Trash2} from 'lucide-react';
+import {Edit2, Info, MessageCircle, Plus, Search, Trash2, X} from 'lucide-react';
 import {Answer, SmallTalk} from '../types/smallTalk';
 
 export const Learn = () => {
-    const queryClient = useQueryClient();
     const [selectedTalkId, setSelectedTalkId] = useState<number | null>(null);
     const [isSmallTalkFormOpen, setIsSmallTalkFormOpen] = useState(false);
     const [isAnswerFormOpen, setIsAnswerFormOpen] = useState(false);
     const [editingSmallTalk, setEditingSmallTalk] = useState<SmallTalk | null>(null);
     const [editingAnswer, setEditingAnswer] = useState<Answer | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const queryClient = useQueryClient();
 
     // SmallTalk Queries
-    const {data: selectedTalk, isLoading: isSmallTalkLoading, error: smallTalkError} = useQuery({
+    const {data: selectedTalk, isLoading: isSmallTalkLoading} = useQuery({
         queryKey: ['smallTalk', selectedTalkId],
         queryFn: async () => {
-            console.log('Fetching small talk details:', selectedTalkId);
             if (!selectedTalkId) return null;
-
-            // 스몰톡 데이터 가져오기
-            const smallTalk = await getSmallTalk(selectedTalkId);
-
-            // 답변 데이터 가져오기
-            try {
-                const answers = await getAnswers(selectedTalkId);
-                return {
-                    ...smallTalk,
-                    answers: answers || []
-                };
-            } catch (error) {
-                return {
-                    ...smallTalk,
-                    answers: []
-                };
-            }
+            return getSmallTalk(selectedTalkId);
         },
         enabled: !!selectedTalkId
     });
@@ -94,23 +78,44 @@ export const Learn = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             {/* 첫 번째 컬럼 - 리스트 */}
             <div className="w-full mb-4 md:mb-0">
-                <div className="h-[32px] flex justify-between items-center mb-4">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
                     <h1 className="text-xl md:text-2xl font-bold text-gray-900">English Sentences</h1>
-                    <button
-                        onClick={() => {
-                            setEditingSmallTalk(null);
-                            setIsSmallTalkFormOpen(true);
-                        }}
-                        className="flex items-center px-3 py-1.5 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                    >
-                        <Plus className="h-4 w-4 mr-1"/>
-                        <span className="hidden md:inline">새 문장</span>
-                        <span className="md:hidden">추가</span>
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <div className="relative">
+                            <input
+                                type="text"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder="Search"
+                                className="w-[200px] pl-8 pr-8 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 text-right"
+                            />
+                            <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none"/>
+                            {searchQuery && (
+                                <button
+                                    onClick={() => setSearchQuery('')}
+                                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                >
+                                    <X className="h-4 w-4"/>
+                                </button>
+                            )}
+                        </div>
+                        <button
+                            onClick={() => {
+                                setEditingSmallTalk(null);
+                                setIsSmallTalkFormOpen(true);
+                            }}
+                            className="flex items-center px-3 py-1.5 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                            <Plus className="h-4 w-4 mr-1"/>
+                            <span className="hidden md:inline">새 문장</span>
+                            <span className="md:hidden">추가</span>
+                        </button>
+                    </div>
                 </div>
                 <SmallTalkList
                     onSelectTalk={setSelectedTalkId}
                     selectedTalkId={selectedTalkId}
+                    searchQuery={searchQuery}
                 />
             </div>
 
@@ -120,10 +125,6 @@ export const Learn = () => {
                 {isSmallTalkLoading ? (
                     <div className="flex justify-center items-center h-64">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"></div>
-                    </div>
-                ) : smallTalkError ? (
-                    <div className="bg-red-50 rounded-lg p-4 md:p-6 text-center text-red-600">
-                        데이터를 불러오는데 실패했습니다.
                     </div>
                 ) : selectedTalkId && selectedTalk ? (
                     <div className="bg-white rounded-lg shadow-lg">

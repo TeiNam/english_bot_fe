@@ -7,7 +7,7 @@ export interface VocabularyMeaning {
     order_no: number;
 }
 
-export type RuleType = "규칙" | "불규칙";
+export type RuleType = "규칙" | "불규칙" | "규칙없음";
 
 export interface Vocabulary {
     vocabulary_id: number;

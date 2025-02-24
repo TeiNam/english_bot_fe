@@ -1,12 +1,22 @@
 import axiosClient from './axiosClient';
-import {SentenceResponse, SmallTalk} from '../types/smallTalk';
-import {ApiPaginatedResponse, ApiResponse} from '../types/api';
+import {SmallTalk, SmallTalkResponse, SentenceResponse} from '../types/smallTalk';
 
 type Direction = 'current' | 'prev' | 'next';
 
-export const getSmallTalks = async (page: number = 1, size: number = 10): Promise<ApiPaginatedResponse<SmallTalk>> => {
-    const response = await axiosClient.get<ApiPaginatedResponse<SmallTalk>>('/small-talk/', {
+export const getSmallTalks = async (page: number = 1, size: number = 10): Promise<SmallTalkResponse> => {
+    const response = await axiosClient.get<SmallTalkResponse>('/small-talk/', {
         params: {page, size}
+    });
+    return response.data;
+};
+
+export const searchSmallTalks = async (
+    query: string,
+    page: number = 1,
+    size: number = 10
+): Promise<SmallTalkResponse> => {
+    const response = await axiosClient.get<SmallTalkResponse>('/small-talk/search', {
+        params: {query, page, size}
     });
     return response.data;
 };
@@ -27,17 +37,17 @@ export const getSmallTalk = async (talkId: number): Promise<SmallTalk> => {
 };
 
 export const createSmallTalk = async (data: Partial<SmallTalk>): Promise<SmallTalk> => {
-    const response = await axiosClient.post<ApiResponse<SmallTalk>>('/small-talk/', data);
-    return response.data.data;
+    const response = await axiosClient.post<SmallTalk>('/small-talk/', data);
+    return response.data;
 };
 
 export const updateSmallTalk = async (talkId: number, data: Partial<SmallTalk>): Promise<SmallTalk> => {
-    const response = await axiosClient.put<ApiResponse<SmallTalk>>(`/small-talk/${talkId}`, data);
-    return response.data.data;
+    const response = await axiosClient.put<SmallTalk>(`/small-talk/${talkId}`, data);
+    return response.data;
 };
 
 export const deleteSmallTalk = async (talkId: number): Promise<void> => {
-    await axiosClient.delete<ApiResponse<void>>(`/small-talk/${talkId}`);
+    await axiosClient.delete(`/small-talk/${talkId}`);
 };
 
 export const getSentence = async (direction: Direction = 'current', currentTalkId?: number): Promise<SentenceResponse> => {

@@ -23,7 +23,7 @@ export const ManageVocabularyForm = ({vocabularyId, onClose}: Props) => {
         word: initialData?.word || '',
         past_tense: initialData?.past_tense || '',
         past_participle: initialData?.past_participle || '',
-        rule: initialData?.rule || '규칙' as RuleType,
+        rule: initialData?.rule || '규칙없음' as RuleType,
         meanings: initialData?.meanings?.length ? initialData.meanings.map(m => ({
             meaning: m.meaning || '',
             classes: m.classes || '',
@@ -173,6 +173,16 @@ export const ManageVocabularyForm = ({vocabularyId, onClose}: Props) => {
                             className="form-radio h-4 w-4 text-indigo-600"
                         />
                         <span className="ml-2">불규칙</span>
+                    </label>
+                    <label className="inline-flex items-center">
+                        <input
+                            type="radio"
+                            value="규칙없음"
+                            checked={formData.rule === '규칙없음'}
+                            onChange={(e) => setFormData(prev => ({...prev, rule: e.target.value as RuleType}))}
+                            className="form-radio h-4 w-4 text-indigo-600"
+                        />
+                        <span className="ml-2">규칙없음</span>
                     </label>
                 </div>
             </div>

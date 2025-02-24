@@ -1,21 +1,24 @@
 import {useState} from 'react';
 import {keepPreviousData, useQuery} from '@tanstack/react-query';
-import {getSmallTalks} from '../api/smallTalk';
+import {getSmallTalks, searchSmallTalks} from '../api/smallTalk';
 import {getAnswerCounts} from '../api/answer';
 import {Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, MessageSquare, Tag} from 'lucide-react';
 
 interface Props {
     onSelectTalk: (talkId: number) => void;
     selectedTalkId: number | null;
-    pageSize?: number; // Add optional pageSize prop
+    pageSize?: number;
+    searchQuery?: string;
 }
 
-export const SmallTalkList = ({onSelectTalk, selectedTalkId, pageSize = 10}: Props) => {
+export const SmallTalkList = ({onSelectTalk, selectedTalkId, pageSize = 10, searchQuery = ''}: Props) => {
     const [currentPage, setCurrentPage] = useState<number>(1);
 
     const {data, isLoading, error} = useQuery({
-        queryKey: ['smallTalks', currentPage, pageSize],
-        queryFn: () => getSmallTalks(currentPage, pageSize),
+        queryKey: ['smallTalks', currentPage, pageSize, searchQuery],
+        queryFn: () => searchQuery
+            ? searchSmallTalks(searchQuery, currentPage, pageSize)
+            : getSmallTalks(currentPage, pageSize),
         placeholderData: keepPreviousData,
         staleTime: 1000 * 60 * 5, // 5분
     });
@@ -58,7 +61,7 @@ export const SmallTalkList = ({onSelectTalk, selectedTalkId, pageSize = 10}: Pro
     if (!data?.items || data.items.length === 0) {
         return (
             <div className="text-center text-gray-500 p-4">
-                등록된 문장이 없습니다
+                {searchQuery ? '검색 결과가 없습니다' : '등록된 문장이 없습니다'}
             </div>
         );
     }
@@ -118,19 +121,19 @@ export const SmallTalkList = ({onSelectTalk, selectedTalkId, pageSize = 10}: Pro
                             {talk.eng_sentence}
                         </h3>
                         <div className="flex items-center space-x-4 text-sm text-gray-500">
-              <span className="flex items-center">
-                <MessageSquare className="h-4 w-4 mr-1"/>
-                  {answerCountsData?.[talk.talk_id] ?? 0} 답변
-              </span>
                             <span className="flex items-center">
-                <Calendar className="h-4 w-4 mr-1"/>
+                                <MessageSquare className="h-4 w-4 mr-1"/>
+                                {answerCountsData?.[talk.talk_id] ?? 0} 답변
+                            </span>
+                            <span className="flex items-center">
+                                <Calendar className="h-4 w-4 mr-1"/>
                                 {formatDate(talk.create_at)}
-              </span>
+                            </span>
                             {talk.tag && (
                                 <span className="flex items-center">
-                  <Tag className="h-4 w-4 mr-1"/>
+                                    <Tag className="h-4 w-4 mr-1"/>
                                     {talk.tag}
-                </span>
+                                </span>
                             )}
                         </div>
                     </div>
