@@ -1,10 +1,13 @@
 export interface VocabularyMeaning {
     meaning_id: number;
+    vocabulary_id: number;
     meaning: string;
-    classes: string | null;
-    example: string | null;
+    classes: string;
+    example: string;
     parenthesis: string | null;
     order_no: number;
+    create_at: string;
+    update_at: string;
 }
 
 export type RuleType = "규칙" | "불규칙" | "규칙없음";
@@ -14,7 +17,7 @@ export interface Vocabulary {
     word: string;
     past_tense: string | null;
     past_participle: string | null;
-    rule: RuleType | null;
+    rule: RuleType;
     cycle: number;
     create_at: string;
     update_at: string;
