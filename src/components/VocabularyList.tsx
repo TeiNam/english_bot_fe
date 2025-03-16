@@ -323,11 +323,6 @@ export default function VocabularyList({
 
             {shouldShowPagination && (
                 <div className="flex flex-col space-y-2">
-                    {/* 디버깅 정보 */}
-                    <div className="text-xs text-gray-400 text-center">
-                        디버깅: 현재페이지={data.page}, 총페이지={data.total_pages}, 항목수={data.items.length}, 총항목수={data.total}, 모바일={isMobile ? '예' : '아니오'}
-                    </div>
-
                     {/* 데스크톱용 페이지네이션 */}
                     <div className="hidden md:flex justify-center items-center space-x-2">
                         <button
