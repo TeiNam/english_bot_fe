@@ -3,8 +3,15 @@ import {Vocabulary, VocabularyResponse} from '../types/vocabulary';
 
 export const getVocabularies = async (page: number = 1, size: number = 10): Promise<VocabularyResponse> => {
     try {
+        console.log(`API 호출: getVocabularies - page=${page}, size=${size}`);
         const response = await axiosClient.get<VocabularyResponse>('/vocabulary/', {
             params: {page, size}
+        });
+        console.log('API 응답 - getVocabularies 구조:', {
+            page: response.data.page,
+            total_pages: response.data.total_pages,
+            total: response.data.total,
+            items_length: response.data.items.length
         });
         return response.data;
     } catch (error) {
@@ -47,8 +54,15 @@ export const searchVocabularies = async (query: string, page: number = 1, size: 
     }
 
     try {
+        console.log(`API 호출: searchVocabularies - query=${query}, page=${page}, size=${size}`);
         const response = await axiosClient.get<VocabularyResponse>('/vocabulary/text-search', {
             params: {q: query, page, size}
+        });
+        console.log('API 응답 - searchVocabularies 구조:', {
+            page: response.data.page,
+            total_pages: response.data.total_pages,
+            total: response.data.total,
+            items_length: response.data.items.length
         });
         return response.data;
     } catch (error) {

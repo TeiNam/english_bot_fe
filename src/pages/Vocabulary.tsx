@@ -1,5 +1,5 @@
-import {useState} from 'react';
-import {Navigate} from 'react-router-dom';
+import {useEffect, useState} from 'react';
+import {Navigate, useSearchParams} from 'react-router-dom';
 import VocabularyList from '../components/VocabularyList';
 import {VocabularyDetail} from '../components/VocabularyDetail';
 import {ManageVocabularyForm} from '../components/ManageVocabularyForm';
@@ -13,8 +13,14 @@ export const Vocabulary = () => {
     const [isEditMode, setIsEditMode] = useState(false);
     const [isAddMode, setIsAddMode] = useState(false);
     const [wordSearchQuery, setWordSearchQuery] = useState('');
+    const [searchParams, setSearchParams] = useSearchParams();
     const queryClient = useQueryClient();
     const token = useAuthStore((state) => state.token);
+
+    // 디버깅: 페이지 파라미터 변경 추적
+    useEffect(() => {
+        console.log('Vocabulary 컴포넌트 - 페이지 파라미터:', searchParams.get('page'));
+    }, [searchParams]);
 
     if (!token) {
         return <Navigate to="/login" replace/>;
@@ -39,6 +45,17 @@ export const Vocabulary = () => {
         setIsEditMode(true);
     };
 
+    // 검색어 변경 처리
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const query = e.target.value;
+        setWordSearchQuery(query);
+        
+        // 검색어 입력 시 페이지를 1로 리셋
+        const newParams = new URLSearchParams(searchParams);
+        newParams.set('page', '1');
+        setSearchParams(newParams);
+    };
+
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             <div className="w-full mb-4 md:mb-0">
@@ -52,7 +69,7 @@ export const Vocabulary = () => {
                             <input
                                 type="text"
                                 value={wordSearchQuery}
-                                onChange={(e) => setWordSearchQuery(e.target.value)}
+                                onChange={handleSearchChange}
                                 placeholder="Search"
                                 className="w-full md:w-[250px] pl-8 text-right pr-4 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
                             />
