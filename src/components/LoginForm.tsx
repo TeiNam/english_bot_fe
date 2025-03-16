@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {LogIn} from 'lucide-react';
 import {login} from '../api/auth';
@@ -8,7 +8,17 @@ export const LoginForm = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [redirectPath, setRedirectPath] = useState('/practice');
     const navigate = useNavigate();
+
+    // 컴포넌트 마운트 시 세션 스토리지에서 리디렉션 경로를 확인
+    useEffect(() => {
+        const savedPath = sessionStorage.getItem('redirectAfterLogin');
+        if (savedPath) {
+            console.log('Found saved redirect path:', savedPath);
+            setRedirectPath(savedPath);
+        }
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -16,10 +26,14 @@ export const LoginForm = () => {
         setError('');
 
         try {
-            await login({email, password});  // access_token 체크 제거
+            await login({email, password});
 
+            // 로그인 성공 후 저장된 경로로 리디렉션
             setTimeout(() => {
-                navigate('/Practice', {replace: true});
+                // 리디렉션 후 세션 스토리지에서 경로 삭제
+                sessionStorage.removeItem('redirectAfterLogin');
+                navigate(redirectPath, {replace: true});
+                console.log('Redirecting to:', redirectPath);
             }, 100);
         } catch (err) {
             setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
@@ -83,9 +97,9 @@ export const LoginForm = () => {
                             disabled={isLoading}
                             className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
                         >
-              <span className="absolute left-0 inset-y-0 flex items-center pl-3">
-                <LogIn className="h-5 w-5 text-indigo-500 group-hover:text-indigo-400"/>
-              </span>
+                            <span className="absolute left-0 inset-y-0 flex items-center pl-3">
+                                <LogIn className="h-5 w-5 text-indigo-500 group-hover:text-indigo-400"/>
+                            </span>
                             {isLoading ? 'Signing in...' : 'Sign in'}
                         </button>
                     </div>

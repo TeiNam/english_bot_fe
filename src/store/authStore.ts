@@ -21,26 +21,39 @@ export const useAuthStore = create<AuthState>()(
                 set({token, user, tokenExpiry});
             },
             logout: () => {
+                // 먼저 상태 초기화
                 set({token: null, user: null, tokenExpiry: null});
+                
+                // 스토리지 정리 
                 sessionStorage.clear();
                 localStorage.removeItem('auth-storage');
+                
+                // 현재 위치 저장 (로그인 후 리디렉션을 위해)
+                const currentPath = window.location.pathname;
+                if (currentPath !== '/login') {
+                    sessionStorage.setItem('redirectAfterLogin', currentPath);
+                }
+                
+                // 로그인 페이지로 리디렉션
                 window.location.href = '/login';
             },
             isAuthenticated: () => {
-                const state = get();  // 이제 get() 사용 가능
+                const state = get();
                 if (!state.token || !state.tokenExpiry) return false;
                 if (Date.now() >= state.tokenExpiry) {
-                    get().logout();
+                    // 이 부분에서 직접 logout 호출 - 비동기적으로 처리
+                    setTimeout(() => get().logout(), 0);
                     return false;
                 }
                 return true;
             },
             getToken: () => {
-                const state = get();  // 이제 get() 사용 가능
+                const state = get();
                 if (state.token && state.tokenExpiry && Date.now() < state.tokenExpiry) {
                     return state.token;
                 }
-                get().logout();
+                // 이 부분에서 직접 logout 호출 - 비동기적으로 처리
+                setTimeout(() => get().logout(), 0);
                 return null;
             }
         }),

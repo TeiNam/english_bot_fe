@@ -17,7 +17,7 @@ export const login = async (credentials: LoginCredentials): Promise<AuthResponse
         const { data } = response;
 
         if (data && data.access_token && data.user) {
-            const tokenExpiry = Date.now() + (24 * 60 * 60 * 1000);
+            const tokenExpiry = Date.now() + (7 * 24 * 60 * 60 * 1000);
             useAuthStore.getState().setAuth(data.access_token, data.user, tokenExpiry);
             return data;
         }

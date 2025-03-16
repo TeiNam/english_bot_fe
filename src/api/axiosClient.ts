@@ -1,5 +1,5 @@
 // axiosClient.ts
-import axios, {InternalAxiosRequestConfig} from 'axios';
+import axios, {AxiosError, InternalAxiosRequestConfig} from 'axios';
 import {config} from '../config';
 import {ApiError} from '../types/api';
 import {AuthResponse} from '../types/auth';
@@ -88,7 +88,8 @@ const refreshToken = async (): Promise<string> => {
         throw new Error('토큰 갱신 실패: 유효하지 않은 응답');
     } catch (error) {
         console.error('Token refresh failed:', error);
-        useAuthStore.getState().logout();
+        // 로그아웃 함수를 비동기적으로 호출하여 UI 스레드 블록킹 방지
+        setTimeout(() => useAuthStore.getState().logout(), 0);
         throw new Error('세션이 만료되었습니다. 다시 로그인해주세요.');
     }
 };
@@ -139,11 +140,17 @@ const errorHandler = async (error: any): Promise<any> => {
     };
 
     const originalRequest = error.config;
-    const isTokenExpiredError = error.response?.status === 401 &&
+    
+    // 모든 401 에러 확인 (토큰 만료, 인증 실패 등 모든 인증 관련 에러)
+    const isAuthError = error.response?.status === 401;
+    
+    // 토큰 만료 확인 - 응답 메시지에 expired 또는 invalid가 포함된 경우
+    const isTokenExpiredError = isAuthError && 
         (error.response?.data?.detail?.includes('expired') ||
-            error.response?.data?.detail?.includes('invalid'));
+         error.response?.data?.detail?.includes('invalid') ||
+         error.response?.data?.detail?.includes('token'));
 
-    // 토큰 만료 에러 처리
+    // 토큰 만료 에러 처리 - 토큰 갱신 시도
     if (isTokenExpiredError && !originalRequest._retry) {
         if (isRefreshing) {
             return new Promise((resolve, reject) => {
@@ -166,15 +173,20 @@ const errorHandler = async (error: any): Promise<any> => {
             return axiosClient(originalRequest);
         } catch (refreshError) {
             processQueue(refreshError, null);
+            console.error('Token refresh failed, redirecting to login...', refreshError);
+            // 로그아웃 함수 호출 (로그인 페이지로 리디렉션 포함)
+            setTimeout(() => useAuthStore.getState().logout(), 0);
             return Promise.reject(refreshError);
         } finally {
             isRefreshing = false;
         }
     }
 
-    // 토큰 갱신 실패 또는 다른 401 에러의 경우 로그아웃 처리
-    if (error.response?.status === 401) {
-        useAuthStore.getState().logout();
+    // 토큰 갱신 실패 또는 일반적인 401 에러의 경우 로그아웃 처리
+    if (isAuthError) {
+        console.error('Authentication error, redirecting to login...', error);
+        // 로그아웃 함수 호출 (로그인 페이지로 리디렉션 포함)
+        setTimeout(() => useAuthStore.getState().logout(), 0);
         return Promise.reject(new Error('세션이 만료되었습니다. 다시 로그인해주세요.'));
     }
 
