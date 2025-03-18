@@ -5,23 +5,12 @@ import {Book, Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, 
 import {useSearchParams} from 'react-router-dom';
 import {MeaningCounts, Vocabulary} from '../types/vocabulary';
 
-// 타입 정의
-interface Vocabulary {
-    vocabulary_id: number;
-    word: string;
-    create_at: string | null;
-    meanings?: Array<any>; // TODO: meanings의 실제 타입으로 교체 필요
-}
 
 interface VocabulariesResponse {
     items: Vocabulary[];
     total_pages: number;
     page: number;
     total: number;
-}
-
-interface MeaningCounts {
-    [key: number]: number;
 }
 
 interface Props {
